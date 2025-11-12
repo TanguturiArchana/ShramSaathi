@@ -16,7 +16,12 @@ const ChatModal = ({ applicationId, workerId, ownerId, onClose }) => {
 
     // Subscribe to real-time chat updates (topic per application)
     const sub = subscribe(`/topic/chat/${applicationId}`, (msg) => {
-      setMessages((prev) => [...prev, msg]);
+      // avoid duplicates: if a message with same senderId and text already exists, skip
+      setMessages((prev) => {
+        const exists = prev.some(m => m.senderId === msg.senderId && String(m.message).trim() === String(msg.message).trim());
+        if (exists) return prev;
+        return [...prev, msg];
+      });
     });
     return () => sub.unsubscribe();
   }, [applicationId]);
@@ -27,13 +32,27 @@ const ChatModal = ({ applicationId, workerId, ownerId, onClose }) => {
     if (!newMessage.trim()) return;
 
     try {
-      await chatService.sendMessage({
+      // optimistic update: show the message immediately
+      const optimistic = {
+        applicationId,
+        senderId: workerId,
+        receiverId: ownerId,
+        message: newMessage,
+        sentAt: new Date().toISOString(),
+        optimistic: true,
+      };
+      setMessages((prev) => [...prev, optimistic]);
+
+      const saved = await chatService.sendMessage({
         applicationId,
         senderId: workerId,
         receiverId: ownerId,
         message: newMessage,
         senderType: "WORKER",
       });
+
+      // replace the optimistic message with the persisted one
+      setMessages((prev) => prev.map(m => (m.optimistic && m.message === optimistic.message && m.senderId === optimistic.senderId) ? saved : m));
     } catch (err) {
       console.error('Failed to send message:', err);
       alert('Failed to send message. Please try again.');

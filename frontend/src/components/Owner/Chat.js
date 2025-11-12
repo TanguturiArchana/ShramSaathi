@@ -17,8 +17,12 @@ const Chat = ({ applicationId, ownerId, workerId, onClose }) => {
 
     // Subscribe to real-time chat updates (topic per application)
     const sub = subscribe(`/topic/chat/${applicationId}`, (msg) => {
-      // message shape from server should already match { applicationId, senderId, receiverId, message, sentAt }
-      setMessages((prev) => [...prev, msg]);
+      // avoid duplicates: if a message with same senderId and text already exists, skip
+      setMessages((prev) => {
+        const exists = prev.some(m => m.senderId === msg.senderId && String(m.message).trim() === String(msg.message).trim());
+        if (exists) return prev;
+        return [...prev, msg];
+      });
     });
     return () => sub.unsubscribe();
   }, [applicationId]);
@@ -28,13 +32,31 @@ const Chat = ({ applicationId, ownerId, workerId, onClose }) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    await chatService.sendMessage({
+    // optimistic update
+    const optimistic = {
       applicationId,
       senderId: ownerId,
       receiverId: workerId,
       message: newMessage,
-      senderType: "OWNER",
-    });
+      sentAt: new Date().toISOString(),
+      optimistic: true,
+    };
+    setMessages((prev) => [...prev, optimistic]);
+
+    try {
+      const saved = await chatService.sendMessage({
+        applicationId,
+        senderId: ownerId,
+        receiverId: workerId,
+        message: newMessage,
+        senderType: "OWNER",
+      });
+      // replace optimistic message with server persisted message
+      setMessages((prev) => prev.map(m => (m.optimistic && m.message === optimistic.message && m.senderId === optimistic.senderId) ? saved : m));
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      alert('Failed to send message.');
+    }
     setNewMessage("");
   };
 
