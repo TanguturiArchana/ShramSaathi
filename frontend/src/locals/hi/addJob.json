@@ -1,0 +1,26 @@
+{
+  "title": "नई नौकरी जोड़ें",
+
+  "fields": {
+    "job_title": "नौकरी का शीर्षक",
+    "owner_name": "मालिक का नाम",
+    "decision_deadline": "निर्णय की अंतिम तिथि",
+    "skill_needed": "आवश्यक कौशल",
+    "location": "स्थान",
+    "area": "क्षेत्र / इलाका",
+    "colony": "कॉलोनी / सोसाइटी",
+    "state": "राज्य",
+    "pincode": "पिनकोड",
+    "pay": "मजदूरी",
+    "duration": "अवधि"
+  },
+
+  "buttons": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें"
+  },
+
+  "errors": {
+    "create_failed": "नौकरी जोड़ने में विफल"
+  }
+}

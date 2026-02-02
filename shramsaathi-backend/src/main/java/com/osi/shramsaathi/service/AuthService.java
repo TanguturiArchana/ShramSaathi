@@ -38,7 +38,10 @@ public class AuthService {
                         .pincode(user.getPincode())
                         .password(encodedPassword) 
                         .registered(true)
+                        .preferredLanguage(user.getPreferredLanguage() != null ? user.getPreferredLanguage() : "en")
                         .build()
+                        
+
         );
 
         return randomPassword;
@@ -60,7 +63,9 @@ public class AuthService {
                         .pincode(owner.getPincode())
                         .password(encodedPassword)  
                         .registered(true)
+                        .preferredLanguage(owner.getPreferredLanguage() != null ? owner.getPreferredLanguage() : "en")
                         .build()
+                        
         );
 
         return randomPassword;

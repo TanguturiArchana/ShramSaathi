@@ -1,0 +1,27 @@
+{
+  "title": "Job Applications",
+  "subtitle": "Manage all job requests from one panel",
+  "select_job": "Select Job",
+  "filters": "Filters",
+  "min_age": "Min age",
+  "max_age": "Max age",
+  "min_exp": "Min exp (yrs)",
+  "max_exp": "Max exp (yrs)",
+  "pincode": "Pincode",
+  "search": "Search",
+  "clear": "Clear",
+  "loading": "Loading applications...",
+  "no_results": "No applications match the current filters.",
+  "accept": "Accept",
+  "reject": "Reject",
+  "chat": "Chat",
+  "view_profile": "View profile",
+  "hide_profile": "Hide profile",
+  "table": {
+    "worker_name": "Worker Name",
+    "skill": "Skill",
+    "applied_on": "Applied On",
+    "status": "Status",
+    "actions": "Actions"
+  }
+}

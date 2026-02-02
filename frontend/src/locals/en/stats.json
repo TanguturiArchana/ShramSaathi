@@ -1,0 +1,8 @@
+{
+  "stats": {
+    "owners_registered": "Total no. of owners registered",
+    "workers_registered": "Total no. of workers registered",
+    "jobs_posted": "Total jobs posted",
+    "active_jobs": "Total Active Jobs"
+  }
+}

@@ -15,19 +15,23 @@ import com.osi.shramsaathi.model.User;
 import com.osi.shramsaathi.repository.UserRepository;
 import com.osi.shramsaathi.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.osi.shramsaathi.service.TranslationService;
+import com.osi.shramsaathi.repository.JobRepository;
+import com.osi.shramsaathi.repository.OwnerRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final TranslationService translationService;
+    private final OwnerRepository ownerRepository;
 
     private final UserRepository userRepository;
      private final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
 
     @Override
     public UserResponse register(UserRequest request) {
-
         String password = request.getPassword() != null && !request.getPassword().isEmpty()
                 ? request.getPassword()
                 : "worker123";
@@ -52,6 +56,34 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         return toResponse(savedUser);
     }
+
+    @Override
+    public List<UserResponse> getAllUsersForOwner(Long ownerId) {
+
+    String lang = ownerRepository.findById(ownerId)
+            .map(o -> o.getPreferredLanguage())
+            .orElse("en");
+
+    return userRepository.findAll()
+            .stream()
+            .map(user -> {
+                UserResponse res = toResponse(user);
+                res.setName(translationService.translate(res.getName(), lang));
+                res.setWorkType(translationService.translate(res.getWorkType(), lang));
+                res.setAddress(translationService.translate(res.getAddress(), lang));
+                res.setDistrict(translationService.translate(res.getDistrict(), lang));
+                res.setMandal(translationService.translate(res.getMandal(), lang));
+                res.setArea(translationService.translate(res.getArea(), lang));
+                res.setColony(translationService.translate(res.getColony(), lang));
+                
+
+                return res;
+            })
+            .toList();
+}
+
+
+
 
     @Override
     public List<UserResponse> getAllUsers() {

@@ -1,0 +1,24 @@
+{
+  "opening": {
+    "title": "हाल की नौकरी की घोषणाएँ",
+    "apply_now": "अभी आवेदन करें",
+    "jobs": [
+      {
+        "id": 1,
+        "title": "प्लंबर की आवश्यकता है",
+        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
+        "salary": "INR 15,000 / Month",
+        "type": "पूर्णकालिक",
+        "website": "www.blujobs.in"
+      },
+      {
+        "id": 2,
+        "title": "हाउसकीपिंग स्टाफ की आवश्यकता है",
+        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
+        "salary": "INR 30,000 / Month",
+        "type": "पूर्णकालिक",
+        "website": "www.blujobs.in"
+      }
+    ]
+  }
+}

@@ -33,6 +33,16 @@ public class JobController {
         return ResponseEntity.ok(jobs);
     }
 
+    @GetMapping("/analytics/{ownerId}")
+    public ResponseEntity<List<JobResponse>> analyticsJobs(
+        @PathVariable Long ownerId) {
+
+    return ResponseEntity.ok(
+            jobService.getAnalyticsJobsByOwner(ownerId)
+    );
+}
+
+
     // ✅ POST: Create new job
     @PostMapping
     public ResponseEntity<JobResponse> createJob(@RequestBody JobRequest jobRequest) {

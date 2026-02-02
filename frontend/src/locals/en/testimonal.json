@@ -1,0 +1,22 @@
+{
+  "testimonials": {
+    "title": "What Our Workers Say About Us",
+    "list": [
+      {
+        "id": 1,
+        "text": "This platform helped me find work quickly and easily.",
+        "name": "Ramesh"
+      },
+      {
+        "id": 2,
+        "text": "I got regular job opportunities near my location.",
+        "name": "Suresh"
+      },
+      {
+        "id": 3,
+        "text": "The process is simple and support team is very helpful.",
+        "name": "Mahesh"
+      }
+    ]
+  }
+}

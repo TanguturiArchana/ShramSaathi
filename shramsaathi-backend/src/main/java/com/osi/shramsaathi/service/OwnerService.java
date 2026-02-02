@@ -11,6 +11,7 @@ import com.osi.shramsaathi.model.Owner;
 import com.osi.shramsaathi.repository.OwnerRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import lombok.RequiredArgsConstructor;
+import com.osi.shramsaathi.service.TranslationService;
 
 
 @Service
@@ -19,14 +20,36 @@ public class OwnerService {
 
     private final OwnerRepository ownerRepository;
     private final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
+    private final TranslationService translationService;
     
+    // public OwnerResponse getOwnerById(Long id) {
+    //     Owner owner = ownerRepository.findById(id)
+    //         .orElseThrow(() -> new RuntimeException("Owner not found"));
+    //     return mapToResponse(owner);
+
+
+    // }
     public OwnerResponse getOwnerById(Long id) {
-        Owner owner = ownerRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Owner not found"));
-        return mapToResponse(owner);
 
+    Owner owner = ownerRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Owner not found"));
 
-    }
+    String lang = owner.getPreferredLanguage() != null
+            ? owner.getPreferredLanguage()
+            : "en";
+
+    OwnerResponse res = mapToResponse(owner);
+
+    // 🔥 TRANSLATE DISPLAY FIELDS
+    res.setName(translationService.translate(res.getName(), lang));
+    res.setBusinessName(translationService.translate(res.getBusinessName(), lang));
+    res.setAddress(translationService.translate(res.getAddress(), lang));
+    res.setDistrict(translationService.translate(res.getDistrict(), lang));
+    res.setMandal(translationService.translate(res.getMandal(), lang));
+
+    return res;
+}
+
 
    
     public Owner updateField(Long id, String field, String value) {

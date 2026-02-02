@@ -1,13 +1,39 @@
+// import React from "react";
+// import "./Testimonials.css"; 
+
+// const Testimonials = () => {
+//   return (
+//     <section className="testimonials-section">
+//       <h2>What Our Workers Say About Us</h2>
+//       <div className="testimonials-container">
+//         {[1, 2, 3].map((i) => (
+//           <div key={i} className="testimonial-card"></div>
+//         ))}
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default Testimonials;
 import React from "react";
-import "./Testimonials.css"; 
+import "./Testimonials.css";
+import { useTranslation } from "react-i18next";
 
 const Testimonials = () => {
+  const { t } = useTranslation("testimonal");
+
+  const testimonials = t("testimonials.list", { returnObjects: true });
+
   return (
     <section className="testimonials-section">
-      <h2>What Our Workers Say About Us</h2>
+      <h2>{t("testimonials.title")}</h2>
+
       <div className="testimonials-container">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="testimonial-card"></div>
+        {testimonials.map((item) => (
+          <div key={item.id} className="testimonial-card">
+            <p className="testimonial-text">“{item.text}”</p>
+            <p className="testimonial-name">— {item.name}</p>
+          </div>
         ))}
       </div>
     </section>

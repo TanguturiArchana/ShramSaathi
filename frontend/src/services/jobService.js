@@ -14,6 +14,12 @@ export const jobService = {
     const res = await axios.post(`${API_BASE_URL}/jobs`, jobData);
     return res.data;
   },
+  getAnalyticsJobs: async (ownerId) => {
+  const res = await axios.get(
+    `http://localhost:8083/api/jobs/analytics/${ownerId}`
+  );
+  return res.data;
+},
 
   // ✅ Delete a job
   deleteJob: async (jobId) => {

@@ -34,6 +34,15 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> all() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+    @GetMapping("/owner/{ownerId}")
+public ResponseEntity<List<UserResponse>> allForOwner(
+        @PathVariable Long ownerId) {
+
+    return ResponseEntity.ok(
+            userService.getAllUsersForOwner(ownerId)
+    );
+}
+
      @GetMapping("/findByNameAndPassword")
     public ResponseEntity<UserResponse> findByNameAndPassword(@RequestParam String name,@RequestParam String password) {
         return ResponseEntity.ok(userService.findByNameAndPassword(name, password));
@@ -66,8 +75,8 @@ public class UserController {
     }
 
     /** ⭐ FIX ADDED — Get user by ID */
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
+    // @GetMapping("/{id}")
+    // public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+    //     return ResponseEntity.ok(userService.getUserById(id));
+    // }
 }

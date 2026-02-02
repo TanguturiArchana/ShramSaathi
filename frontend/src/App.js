@@ -21,6 +21,8 @@ import WorkerProfile from "./components/Worker/WorkerProfile";
 
 
 function App() {
+  console.log("Analytics:", Analytics);
+
   return (
     <Router>
       <Routes>
@@ -52,7 +54,6 @@ function App() {
           <Route path="/owner/analytics" element={<Analytics />} />
           <Route path="/owner/applications" element={<ApplicationsPanel />} />
           <Route path="/owner/profile" element={<OwnerProfile />} />
-          
 
         </Route>
       </Routes>

@@ -3,8 +3,12 @@ import { jobService } from "../../services/jobService";
 import "./AddJobModal.css";
 import "./JobManager.css";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+
 
 const AddJobModal = ({ closeModal, onJobAdded ,id}) => {
+  const { t } = useTranslation("addJob");
+
   const [form, setForm] = useState({
     title: "",
     skillNeeded: "",
@@ -52,22 +56,23 @@ const AddJobModal = ({ closeModal, onJobAdded ,id}) => {
     <div className="modal">
       <h3 className="modal-title">Add New Job</h3>
       <form onSubmit={handleSubmit}>
+        <h3 className="modal-title">{t("title")}</h3>
         <input
           name="title"
-          placeholder="Job Title"
+          placeholder={t("fields.job_title")}
           value={form.title}
           onChange={handleChange}
           required
         />
-          <input
+        
+        <input
           name="ownerName"
-          placeholder="Owner Name"
+          placeholder={t("fields.owner_name")}
           value={form.ownerName}
           onChange={handleChange}
           required
         />
-
-        {/* FIXED → must use decisionDeadline */}
+        
         <input
           type="date"
           name="decisionDeadline"
@@ -75,67 +80,77 @@ const AddJobModal = ({ closeModal, onJobAdded ,id}) => {
           onChange={handleChange}
           required
         />
+        
         <input
           name="skillNeeded"
-          placeholder="Skill Needed"
+          placeholder={t("fields.skill_needed")}
           value={form.skillNeeded}
           onChange={handleChange}
           required
         />
+        
         <input
           name="location"
-          placeholder="Location"
+          placeholder={t("fields.location")}
           value={form.location}
           onChange={handleChange}
           required
         />
+        
         <input
           name="area"
-          placeholder="Area / Locality (e.g. Banjara Hills)"
+          placeholder={t("fields.area")}
           value={form.area}
           onChange={handleChange}
         />
+        
         <input
           name="colony"
-          placeholder="Colony / Society (optional)"
+          placeholder={t("fields.colony")}
           value={form.colony}
           onChange={handleChange}
         />
+        
         <input
           name="state"
-          placeholder="State (e.g. Telangana)"
+          placeholder={t("fields.state")}
           value={form.state}
           onChange={handleChange}
         />
+        
         <input
           name="pincode"
-          placeholder="Pincode / Postal Code (e.g. 500081)"
+          placeholder={t("fields.pincode")}
           value={form.pincode}
           onChange={handleChange}
         />
+        
         <input
           name="pay"
-          placeholder="Pay (e.g., ₹800/day)"
+          placeholder={t("fields.pay")}
           value={form.pay}
           onChange={handleChange}
           required
         />
+        
         <input
           name="duration"
-          placeholder="Duration (e.g., 5 days)"
+          placeholder={t("fields.duration")}
           value={form.duration}
           onChange={handleChange}
           required
         />
+        
+        <button type="submit" className="save-btn">
+          {t("buttons.save")}
+        </button>
+        
+        <button type="button" className="cancel-btn" onClick={closeModal}>
+          {t("buttons.cancel")}
+        </button>
 
-        <div className="modal-buttons">
-          <button type="submit" className="save-btn">
-            Save
-          </button>
-          <button type="button" className="cancel-btn" onClick={closeModal}>
-            Cancel
-          </button>
-        </div>
+
+       
       </form>
     </div>
   );

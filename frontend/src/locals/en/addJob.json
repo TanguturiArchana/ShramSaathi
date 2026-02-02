@@ -1,0 +1,26 @@
+{
+  "title": "Add New Job",
+
+  "fields": {
+    "job_title": "Job Title",
+    "owner_name": "Owner Name",
+    "decision_deadline": "Decision Deadline",
+    "skill_needed": "Skill Needed",
+    "location": "Location",
+    "area": "Area / Locality (e.g. Banjara Hills)",
+    "colony": "Colony / Society (optional)",
+    "state": "State (e.g. Telangana)",
+    "pincode": "Pincode / Postal Code (e.g. 500081)",
+    "pay": "Pay (e.g., ₹800/day)",
+    "duration": "Duration (e.g., 5 days)"
+  },
+
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+
+  "errors": {
+    "create_failed": "Failed to create job. Check backend."
+  }
+}

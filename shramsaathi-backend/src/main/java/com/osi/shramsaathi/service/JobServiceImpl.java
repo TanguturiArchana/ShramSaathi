@@ -19,9 +19,14 @@ import com.osi.shramsaathi.dto.JobResponse;
 import com.osi.shramsaathi.exception.ResourceNotFoundException;
 import com.osi.shramsaathi.model.Job;
 import com.osi.shramsaathi.repository.JobRepository;
+import com.osi.shramsaathi.service.TranslationService;
+import com.osi.shramsaathi.repository.OwnerRepository;
 
 @Service
 public class JobServiceImpl implements JobService {
+    private final TranslationService translationService;
+    private final OwnerRepository ownerRepository;
+
 
     private final JobRepository jobRepository;
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -29,9 +34,12 @@ public class JobServiceImpl implements JobService {
     // Simple in-memory cache for geocoding queries -> [lat, lon]
     private final ConcurrentHashMap<String, double[]> geocodeCache = new ConcurrentHashMap<>();
 
-    public JobServiceImpl(JobRepository jobRepository) {
+    public JobServiceImpl(JobRepository jobRepository,OwnerRepository ownerRepository,TranslationService translationService) {
         this.jobRepository = jobRepository;
+        this.ownerRepository = ownerRepository;
+        this.translationService = translationService;
     }
+
 
     private JobResponse map(Job job) {
         JobResponse r = new JobResponse();
@@ -166,10 +174,36 @@ public class JobServiceImpl implements JobService {
                 new ResourceNotFoundException("Job not found: " + id));
         return map(job);
     }
+    @Override
+public List<JobResponse> getAnalyticsJobsByOwner(Long ownerId) {
 
+    String lang = ownerRepository.findById(ownerId)
+            .map(o -> o.getPreferredLanguage())
+            .orElse("en");
+
+    // 🌍 ALL jobs (not owner-specific)
+    return jobRepository.findAll()
+            .stream()
+            .map(job -> translateJob(map(job), lang))
+            .collect(Collectors.toList());
+}
+
+
+    // public List<JobResponse> getJobsByOwner(Long ownerId) {
+    //     return jobRepository.findByOwnerId(ownerId).stream().map(this::map).collect(Collectors.toList());
+    // }
     public List<JobResponse> getJobsByOwner(Long ownerId) {
-        return jobRepository.findByOwnerId(ownerId).stream().map(this::map).collect(Collectors.toList());
+
+        String lang = ownerRepository.findById(ownerId)
+            .map(o -> o.getPreferredLanguage())
+            .orElse("en");
+
+        return jobRepository.findByOwnerId(ownerId)
+            .stream()
+            .map(job -> translateJob(map(job), lang))
+            .collect(Collectors.toList());
     }
+
 
     public List<JobResponse> searchBySkill(String skill) {
         return jobRepository.findBySkillNeededContainingIgnoreCase(skill).stream().map(this::map).collect(Collectors.toList());
@@ -181,6 +215,20 @@ public class JobServiceImpl implements JobService {
                 .stream()
                 .map(this::map)
                 .collect(Collectors.toList());
+    }
+
+
+    private JobResponse translateJob(JobResponse job, String lang) {
+
+        job.setTitle(translationService.translate(job.getTitle(), lang));
+        job.setSkillNeeded(translationService.translate(job.getSkillNeeded(), lang));
+        job.setLocation(translationService.translate(job.getLocation(), lang));
+        job.setArea(translationService.translate(job.getArea(), lang));
+        job.setColony(translationService.translate(job.getColony(), lang));
+        job.setState(translationService.translate(job.getState(), lang));
+        job.setStatus(translationService.translate(job.getStatus(), lang));
+
+        return job;
     }
 
 }

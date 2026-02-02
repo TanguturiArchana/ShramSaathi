@@ -1,0 +1,48 @@
+{
+  "title": "Owner Profile",
+  "loading": "Loading profile...",
+  "not_found": "Owner not found — ID:",
+
+  "labels": {
+    "name": "Name",
+    "phone": "Phone",
+    "business": "Business Name",
+    "address": "Address",
+    "district": "District",
+    "mandal": "Mandal",
+    "pincode": "Pincode",
+    "registered": "Registered"
+  },
+
+  "yes": "Yes",
+  "no": "No",
+
+  "buttons": {
+    "logout": "Logout 🔐",
+    "change_password": "Change Password 🔁",
+    "update": "Update",
+    "cancel": "Cancel ❌"
+  },
+
+  "password": {
+    "title": "Change Password",
+    "old": "Old Password",
+    "new": "New Password",
+    "confirm": "Confirm New Password",
+    "update": "Update Password",
+
+    "required": "All fields are required!",
+    "mismatch": "New password and Confirm password do not match!",
+    "success": "Password changed successfully!",
+    "failed": "Password update failed"
+  },
+
+  "update_popup": {
+    "title": "Update"
+  },
+
+  "alerts": {
+    "update_success": "Updated successfully!",
+    "update_failed": "Update failed"
+  }
+}

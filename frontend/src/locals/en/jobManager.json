@@ -1,0 +1,41 @@
+{
+  "title": "Owner Dashboard",
+  "subtitle": "Manage job postings and track worker applications",
+
+  "tabs": {
+    "jobs": "🏢 Jobs",
+    "workers": "👷 All Workers"
+  },
+
+  "add_job": "+ Add New Job",
+
+  "confirm_delete": "Are you sure you want to delete this job?",
+
+  "jobs_table": {
+    "title": "Title",
+    "skill": "Skill Needed",
+    "location": "Location",
+    "pay": "Pay",
+    "duration": "Duration",
+    "status": "Status",
+    "action": "Action",
+    "delete": "Delete",
+    "empty": "No jobs posted yet."
+  },
+
+  "workers_table": {
+    "name": "Name",
+    "skill": "Skill",
+    "contact": "Contact",
+    "location": "Location",
+    "area": "Area / Colony",
+    "pincode": "Pincode",
+    "empty": "No workers registered yet."
+  },
+
+  "fallback": {
+    "unnamed": "Unnamed",
+    "no_contact": "No contact",
+    "na": "N/A"
+  }
+}

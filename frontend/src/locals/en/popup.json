@@ -1,0 +1,43 @@
+{
+  "popup": {
+    "login_register": "Login or Register",
+    "select_role": "Select your role to continue:",
+    "login_worker": "Login as Worker",
+    "login_owner": "Login as Owner",
+    "close": "Close",
+
+    "register_worker": "Register Worker",
+    "register_owner": "Register Business Owner",
+
+    "name": "Name",
+    "phone": "Phone",
+    "address": "Address",
+    "work_type": "Work Type",
+    "district": "District",
+    "mandal": "Mandal",
+    "pincode": "Pincode",
+    "age": "Age",
+    "experience": "Experience",
+    "business_name": "Business Name",
+    "email": "Email Address",
+
+    "register": "Register",
+    "login": "Login",
+
+    "success_title": "Registered Successfully!!!",
+    "password_msg": "Your password to login to ShramSaathi is",
+    "username": "Username",
+
+
+
+    
+  "login_title": "Login to ShramSaathi",
+  "username": "Username",
+  "password": "Password",
+  "login": "Login",
+  "close": "Close",
+  "login_success": "Worker Login successful!"
+
+
+  }
+}

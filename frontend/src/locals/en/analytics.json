@@ -1,0 +1,17 @@
+{
+  "title": "ShramSaathi Analytics Dashboard",
+  "subtitle": "Track job trends, wages, and skill demand",
+
+  "no_data": "No jobs data available yet.",
+
+  "cards": {
+    "total": "Total Jobs",
+    "active": "Active Jobs",
+    "completed": "Completed Jobs"
+  },
+
+  "charts": {
+    "jobs_by_skill": "Jobs by Skill",
+    "pay_by_skill": "Total Pay by Skill"
+  }
+}

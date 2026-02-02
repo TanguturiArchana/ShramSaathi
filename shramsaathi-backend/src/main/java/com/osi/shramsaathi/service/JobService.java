@@ -14,4 +14,6 @@ public interface JobService {
     
     // ✅ Add this line
     List<JobResponse> getAllJobs();
+    List<JobResponse> getAnalyticsJobsByOwner(Long ownerId);
+
 }

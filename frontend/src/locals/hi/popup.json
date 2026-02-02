@@ -1,0 +1,39 @@
+{
+  "popup": {
+    "login_register": "लॉगिन या पंजीकरण करें",
+    "select_role": "जारी रखने के लिए अपनी भूमिका चुनें:",
+    "login_worker": "कार्यकर्ता के रूप में लॉगिन करें",
+    "login_owner": "मालिक के रूप में लॉगिन करें",
+    "close": "बंद करें",
+
+    "register_worker": "कार्यकर्ता पंजीकरण",
+    "register_owner": "व्यवसाय मालिक पंजीकरण",
+
+    "name": "नाम",
+    "phone": "फ़ोन",
+    "address": "पता",
+    "work_type": "कार्य प्रकार",
+    "district": "ज़िला",
+    "mandal": "मंडल",
+    "pincode": "पिनकोड",
+    "age": "आयु",
+    "experience": "अनुभव",
+    "business_name": "व्यवसाय का नाम",
+    "email": "ईमेल पता",
+
+    "register": "पंजीकरण करें",
+    "login": "लॉगिन करें",
+
+    "success_title": "सफलतापूर्वक पंजीकृत!",
+    "password_msg": "ShramSaathi में लॉगिन करने के लिए आपका पासवर्ड है",
+    "username": "उपयोगकर्ता नाम",
+
+
+    "login_title": "ShramSaathi में लॉगिन करें",
+    "username": "उपयोगकर्ता नाम",
+    "password": "पासवर्ड",
+    "login": "लॉगिन करें",
+    "close": "बंद करें",
+    "login_success": "कार्यकर्ता लॉगिन सफल!"
+  }
+}
