@@ -1,0 +1,44 @@
+{
+  "title": "Skill Test and Trust Badge",
+  "subtitle": "Answer these quick questions to show owners verified capability before selection.",
+  "skill_track": "Skill track",
+  "carpentry": "Carpentry",
+  "building": "Building",
+  "general": "General Work",
+  "loading": "Loading questions...",
+  "submit": "Submit Test",
+  "submitting": "Submitting...",
+  "reload": "Reload Questions",
+  "no_profiles": "No skill assessments yet.",
+  "my_skills": "My Verified Skills",
+  "score": "Score",
+  "level": "Level",
+  "questions": {
+    "carpentry": [
+      {
+        "id": 1,
+        "question": "Which tool is best for smooth wood finishing?",
+        "options": ["Hammer", "Sandpaper", "Drill", "Tape"]
+      },
+      {
+        "id": 2,
+        "question": "In carpentry, plumb means:",
+        "options": ["Vertical alignment", "Horizontal level", "Paint coat", "Wood quality"]
+      }
+    ],
+    "building": [
+      {
+        "id": 1,
+        "question": "Concrete curing should ideally continue for:",
+        "options": ["1 day", "2 days", "7 days or more", "No curing"]
+      }
+    ],
+    "general": [
+      {
+        "id": 1,
+        "question": "What improves owner trust most?",
+        "options": ["Late arrival", "Clear communication", "Skipping safety", "No estimate"]
+      }
+    ]
+  }
+}

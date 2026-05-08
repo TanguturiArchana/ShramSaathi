@@ -1,5 +1,3 @@
-// src/main/java/com/osi/shramsaathi/service/JobPostingService.java
-
 package com.osi.shramsaathi.service;
 
 import com.osi.shramsaathi.model.JobPosting;

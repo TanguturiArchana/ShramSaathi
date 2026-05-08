@@ -1,0 +1,71 @@
+{
+  "header": {
+    "title": "Worker Dashboard",
+    "subtitle": "Find jobs, apply, and manage your profile easily"
+  },
+
+  "tabs": {
+    "available_jobs": "Available Jobs",
+    "my_applications": "My Applications",
+    "my_profile": "My Profile"
+  },
+
+  "jobs": {
+    "table": {
+      "title": "Title",
+      "skill": "Skill Needed",
+      "location": "Location",
+      "area": "Area",
+      "colony": "Colony",
+      "pay": "Pay",
+      "duration": "Duration",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "no_jobs": "No jobs available right now.",
+    "available": "Available",
+    "apply": "Apply Now",
+    "already_applied": "Already Applied",
+    "loading_route": "Loading..."
+  },
+
+  "applications": {
+    "table": {
+      "job_title": "Job Title",
+      "location": "Location",
+      "pay": "Pay",
+      "status": "Status",
+      "applied_on": "Applied On",
+      "action": "Action"
+    },
+    "no_applications": "You haven’t applied for any jobs yet.",
+    "chat_owner": "Chat with Owner",
+    "chat_unavailable": "Chat Unavailable",
+    "route_owner": "Route to Owner"
+  },
+
+  "messages": {
+    "apply_success": "Applied successfully!",
+    "already_applied": "You’ve already applied for this job.",
+    "apply_failed": "Failed to apply. Try again.",
+    "load_jobs_failed": "Failed to load jobs. Please try again.",
+    "load_applications_failed": "Failed to load applications. Please try again.",
+    "owner_missing": "Unable to start chat - Owner information not available"
+  },
+
+  "status": {
+    "accepted": "Accepted",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+  "send":"Send",
+  "comments":"Comments",
+  "route":"Route",
+  "take":"Take Skill Test",
+  "complete":"Complete your skill test to get a verified trust badge and improve acceptance chances.",
+  "no comments":"No comments yet. Be the first!",
+  "skill test":" Skill Test",
+  "notifications":"Notifications",
+  "days":"days"
+
+}

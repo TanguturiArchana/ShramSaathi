@@ -35,10 +35,10 @@ public class TranslationService {
             HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // quick parse
+            
             return response.body().split("\"")[1];
         } catch (Exception e) {
-            return text; // fallback safe
+            return text; 
         }
     }
 }

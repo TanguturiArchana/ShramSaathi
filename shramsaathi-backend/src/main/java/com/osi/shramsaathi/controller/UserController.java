@@ -1,18 +1,15 @@
-
 package com.osi.shramsaathi.controller;
 
 import com.osi.shramsaathi.dto.OwnerResponse;
 import com.osi.shramsaathi.dto.UserRequest;
 import com.osi.shramsaathi.dto.UserResponse;
 import com.osi.shramsaathi.service.UserService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.osi.shramsaathi.model.User;
 import java.util.*;
 
 @RestController
@@ -22,28 +19,33 @@ public class UserController {
 
     private final UserService userService;
 
-    /** Register a new user */
+  
     @PostMapping
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest request) {
         UserResponse response = userService.register(request);
         return ResponseEntity.ok(response);
     }
 
-    /** Get all users */
+   
     @GetMapping
     public ResponseEntity<List<UserResponse>> all() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
     @GetMapping("/owner/{ownerId}")
-public ResponseEntity<List<UserResponse>> allForOwner(
-        @PathVariable Long ownerId) {
+    public ResponseEntity<List<UserResponse>> allForOwner(@PathVariable Long ownerId) {
+        return ResponseEntity.ok(userService.getAllUsersForOwner(ownerId));
+    }
 
-    return ResponseEntity.ok(
-            userService.getAllUsersForOwner(ownerId)
-    );
-}
+     @PutMapping("/update-field/{id}")
+    public User updateField(
+            @PathVariable Long id,
+            @RequestParam String field,
+            @RequestParam String value
+    ) {
+        return userService.updateField(id, field, value);
+    }
 
-     @GetMapping("/findByNameAndPassword")
+    @GetMapping("/findByNameAndPassword")
     public ResponseEntity<UserResponse> findByNameAndPassword(@RequestParam String name,@RequestParam String password) {
         return ResponseEntity.ok(userService.findByNameAndPassword(name, password));
     }
@@ -74,9 +76,8 @@ public ResponseEntity<List<UserResponse>> allForOwner(
         return ResponseEntity.ok(result);
     }
 
-    /** ⭐ FIX ADDED — Get user by ID */
-    // @GetMapping("/{id}")
-    // public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-    //     return ResponseEntity.ok(userService.getUserById(id));
-    // }
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
 }

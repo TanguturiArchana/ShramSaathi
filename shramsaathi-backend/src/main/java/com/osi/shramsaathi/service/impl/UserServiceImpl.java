@@ -4,6 +4,7 @@ package com.osi.shramsaathi.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.osi.shramsaathi.service.TranslationService;
 import com.osi.shramsaathi.repository.JobRepository;
 import com.osi.shramsaathi.repository.OwnerRepository;
+import com.osi.shramsaathi.service.TranslationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
     private final TranslationService translationService;
     private final OwnerRepository ownerRepository;
+ 
 
     private final UserRepository userRepository;
      private final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
@@ -93,14 +96,23 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    /** ⭐ FIX ADDED — Fetch user by ID */
-    @Override
+   @Override
     public UserResponse getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
-        return toResponse(user);
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found: " + id));
+        String lang = user.getPreferredLanguage() != null? user.getPreferredLanguage(): "en";
+        UserResponse res = toResponse(user);
+        res.setName(translationService.translate(res.getName(), lang));
+        res.setAddress(translationService.translate(res.getAddress(), lang));
+        res.setWorkType(translationService.translate(res.getWorkType(), lang));
+        res.setDistrict(translationService.translate(res.getDistrict(), lang));
+        res.setMandal(translationService.translate(res.getMandal(), lang));
+        res.setArea(translationService.translate(res.getArea(), lang));
+        res.setColony(translationService.translate(res.getColony(), lang));
+        res.setState(translationService.translate(res.getState(), lang));
+        return res;
     }
-     public User updateField(Long id, String field, String value) {
+
+    public User updateField(Long id, String field, String value) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
@@ -144,10 +156,10 @@ public class UserServiceImpl implements UserService {
             }
         }   
 
-    // If no matching password found
+
         throw new RuntimeException("Owner With Given Password And name is not found :Invalid credentials");
     }
-    /** Convert User → UserResponse DTO */
+    
     private UserResponse toResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())

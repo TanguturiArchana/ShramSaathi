@@ -14,14 +14,14 @@ public class ChatWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Receives messages sent to /app/chat and broadcasts to /topic/chat/{applicationId}
+    
     @MessageMapping("/chat")
     public void handleChatMessage(ChatMessage message) {
         if (message == null || message.getApplicationId() == null) return;
         try {
             messagingTemplate.convertAndSend("/topic/chat/" + message.getApplicationId(), message);
         } catch (Exception e) {
-            // log and ignore
+            
             System.err.println("Failed to broadcast chat message: " + e.getMessage());
         }
     }

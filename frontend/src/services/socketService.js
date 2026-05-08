@@ -10,7 +10,7 @@ export function connect() {
     brokerURL: undefined,
     connectHeaders: {},
     debug: function () {
-      // suppress verbose logging in prod
+
     },
     reconnectDelay: 5000,
     webSocketFactory: () => new SockJS('http://localhost:8083/ws'),
@@ -20,7 +20,6 @@ export function connect() {
   });
 
   client.onConnect = () => {
-    // flush pending subscriptions now that the connection is active
     pendingSubscriptions.forEach((p) => {
       try {
         const sub = client.subscribe(p.topic, (msg) => {
@@ -36,24 +35,21 @@ export function connect() {
         console.error('Failed to subscribe to', p.topic, e);
       }
     });
-    // keep pendingSubscriptions entries so callers can unsubscribe later via the returned object
+
   };
 
   client.activate();
   return client;
 }
 
-/**
- * Subscribe to a STOMP topic. If the client is not yet connected, subscription is queued
- * and the returned object provides an unsubscribe() method to cancel before connection.
- */
+
 export function subscribe(topic, handler) {
   if (!client) {
-    // ensure connect() called lazily
+    
     connect();
   }
 
-  // If connected, subscribe immediately
+  
   if (client && client.connected) {
     const sub = client.subscribe(topic, (msg) => {
       try {
@@ -66,23 +62,23 @@ export function subscribe(topic, handler) {
     return sub;
   }
 
-  // Otherwise queue the subscription and return a handle with unsubscribe()
+  
   const pending = { topic, handler, _sub: null };
   pendingSubscriptions.push(pending);
 
   return {
     unsubscribe: () => {
-      // if not yet subscribed, remove from pending queue
+      
       const idx = pendingSubscriptions.indexOf(pending);
       if (idx !== -1) {
         pendingSubscriptions.splice(idx, 1);
       }
-      // if already subscribed, unsubscribe underlying
+      
       if (pending._sub) {
         try {
           pending._sub.unsubscribe();
         } catch (e) {
-          // ignore
+          
         }
       }
     },
@@ -106,7 +102,7 @@ export function disconnect() {
   try {
     client.deactivate();
   } catch (e) {
-    // ignore
+    
   }
   client = null;
   pendingSubscriptions = [];

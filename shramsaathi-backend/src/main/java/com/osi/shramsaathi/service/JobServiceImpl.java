@@ -9,35 +9,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.osi.shramsaathi.dto.JobRequest;
 import com.osi.shramsaathi.dto.JobResponse;
 import com.osi.shramsaathi.exception.ResourceNotFoundException;
 import com.osi.shramsaathi.model.Job;
+import com.osi.shramsaathi.model.User;
 import com.osi.shramsaathi.repository.JobRepository;
 import com.osi.shramsaathi.service.TranslationService;
 import com.osi.shramsaathi.repository.OwnerRepository;
+import com.osi.shramsaathi.repository.UserRepository;
 
 @Service
 public class JobServiceImpl implements JobService {
     private final TranslationService translationService;
     private final OwnerRepository ownerRepository;
+     private final UserRepository userRepository;
 
 
     private final JobRepository jobRepository;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    // Simple in-memory cache for geocoding queries -> [lat, lon]
     private final ConcurrentHashMap<String, double[]> geocodeCache = new ConcurrentHashMap<>();
 
-    public JobServiceImpl(JobRepository jobRepository,OwnerRepository ownerRepository,TranslationService translationService) {
+    public JobServiceImpl(JobRepository jobRepository,OwnerRepository ownerRepository,TranslationService translationService,UserRepository userRepository) {
         this.jobRepository = jobRepository;
         this.ownerRepository = ownerRepository;
         this.translationService = translationService;
+        this.userRepository= userRepository;
     }
 
 
@@ -46,7 +47,7 @@ public class JobServiceImpl implements JobService {
         r.setId(job.getId());
         r.setOwnerId(job.getOwnerId());
         r.setOwnerName(job.getOwnerName());                 
-      r.setDecisionDeadline(job.getDecisionDeadline());   
+        r.setDecisionDeadline(job.getDecisionDeadline());   
         r.setTitle(job.getTitle());
         r.setSkillNeeded(job.getSkillNeeded());
         r.setLocation(job.getLocation());
@@ -63,7 +64,7 @@ public class JobServiceImpl implements JobService {
         return r;
     }
 
-    // Server-side geocoding using Nominatim. Returns {lat,lon} or null.
+
     private double[] geocodeRequest(JobRequest request) {
         try {
             StringBuilder sb = new StringBuilder();
@@ -92,13 +93,11 @@ public class JobServiceImpl implements JobService {
                 JsonNode node = arr.get(0);
                 double lat = node.get("lat").asDouble();
                 double lon = node.get("lon").asDouble();
-                // simple bounding check for India
                 if (lat >= 6 && lat <= 38 && lon >= 68 && lon <= 98) {
                     double[] coords = new double[] { lat, lon };
                     geocodeCache.put(key, coords);
                     return coords;
                 }
-                // if address shows country_code == in, accept
                 if (node.has("address") && node.get("address").has("country_code")
                         && "in".equalsIgnoreCase(node.get("address").get("country_code").asText())) {
                     double[] coords = new double[] { lat, lon };
@@ -116,7 +115,7 @@ public class JobServiceImpl implements JobService {
         Job job = new Job();
         job.setOwnerId(request.getOwnerId());
         job.setOwnerName(request.getOwnerName());              
-      job.setDecisionDeadline(request.getDecisionDeadline()); 
+        job.setDecisionDeadline(request.getDecisionDeadline()); 
         job.setTitle(request.getTitle());
         job.setSkillNeeded(request.getSkillNeeded());
         job.setLocation(request.getLocation());
@@ -127,13 +126,12 @@ public class JobServiceImpl implements JobService {
         job.setColony(request.getColony());
         job.setState(request.getState());
 
-        // attempt server-side geocoding and store coordinates
+        
         double[] coords = geocodeRequest(request);
         if (coords != null) {
             job.setLatitude(coords[0]);
             job.setLongitude(coords[1]);
         }
-
         Job saved = jobRepository.save(job);
         return map(saved);
     }
@@ -175,23 +173,14 @@ public class JobServiceImpl implements JobService {
         return map(job);
     }
     @Override
-public List<JobResponse> getAnalyticsJobsByOwner(Long ownerId) {
-
-    String lang = ownerRepository.findById(ownerId)
-            .map(o -> o.getPreferredLanguage())
-            .orElse("en");
-
-    // 🌍 ALL jobs (not owner-specific)
-    return jobRepository.findAll()
+    public List<JobResponse> getAnalyticsJobsByOwner(Long ownerId) {
+        String lang = ownerRepository.findById(ownerId).map(o -> o.getPreferredLanguage()).orElse("en");
+        return jobRepository.findAll()
             .stream()
             .map(job -> translateJob(map(job), lang))
             .collect(Collectors.toList());
-}
+    }
 
-
-    // public List<JobResponse> getJobsByOwner(Long ownerId) {
-    //     return jobRepository.findByOwnerId(ownerId).stream().map(this::map).collect(Collectors.toList());
-    // }
     public List<JobResponse> getJobsByOwner(Long ownerId) {
 
         String lang = ownerRepository.findById(ownerId)
@@ -210,25 +199,43 @@ public List<JobResponse> getAnalyticsJobsByOwner(Long ownerId) {
     }
 
     @Override
-    public List<JobResponse> getAllJobs() {
+    public List<JobResponse> getAllJobs(Long workerId) {
+        String lang = "en";
+        if (workerId != null) {
+            User worker = userRepository.findById(workerId).orElse(null);
+            lang = (worker != null && worker.getPreferredLanguage() != null)? worker.getPreferredLanguage(): "en";
+        }
+        final String finalLang = lang;   
         return jobRepository.findAll()
-                .stream()
-                .map(this::map)
-                .collect(Collectors.toList());
+            .stream()
+            .map(this::map)
+            .map(job -> translateJob(job, finalLang))
+            .collect(Collectors.toList());
     }
 
-
     private JobResponse translateJob(JobResponse job, String lang) {
-
         job.setTitle(translationService.translate(job.getTitle(), lang));
         job.setSkillNeeded(translationService.translate(job.getSkillNeeded(), lang));
         job.setLocation(translationService.translate(job.getLocation(), lang));
         job.setArea(translationService.translate(job.getArea(), lang));
         job.setColony(translationService.translate(job.getColony(), lang));
         job.setState(translationService.translate(job.getState(), lang));
-        job.setStatus(translationService.translate(job.getStatus(), lang));
-
+        job.setStatus(job.getStatus());
         return job;
+    }
+    @Override
+    public List<JobResponse> getRecentJobs() {
+        return jobRepository.findTop3ByOrderByCreatedAtDesc()
+            .stream()
+            .map(job -> {
+                JobResponse r = new JobResponse();
+                r.setId(job.getId());
+                r.setTitle(job.getTitle());
+                r.setLocation(job.getLocation());
+                r.setPay(job.getPay());
+                return r;
+            })
+            .collect(Collectors.toList());
     }
 
 }

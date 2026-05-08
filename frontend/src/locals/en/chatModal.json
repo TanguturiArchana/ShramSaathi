@@ -1,0 +1,11 @@
+{
+  "title": "Chat with Owner",
+  "no_messages": "No messages yet.",
+  "send": "Send",
+  "placeholders": {
+    "type_message": "Type your message..."
+  },
+  "alerts": {
+    "send_failed": "Failed to send message. Please try again."
+  }
+}

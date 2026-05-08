@@ -1,0 +1,48 @@
+{
+  "title": "కార్మిక ప్రొఫైల్",
+  "logout": "లాగ్ అవుట్",
+  "loading": "ప్రొఫైల్ లోడ్ అవుతోంది...",
+  "not_found": "కార్మికుడు కనబడలేదు",
+  "yes": "అవును",
+  "no": "కాదు",
+  "change_password": "పాస్‌వర్డ్ మార్చండి",
+  "update_password": "పాస్‌వర్డ్ అప్డేట్ చేయండి",
+  "cancel": "రద్దు చేయండి",
+  "update": "అప్డేట్",
+  "success": "విజయం",
+  "error": "లోపం",
+  "warning": "హెచ్చరిక",
+  "update_field": "అప్డేట్",
+  "Account Status": "ఖాతా స్థితి",
+  "Your account is": "మీ ఖాతా ఉంది",
+  "Registered": "నమోదైంది",
+  "Not Registered": "నమోదు కాలేదు",
+  "Account Settings": "ఖాతా సెట్టింగ్స్",
+  "Password Protection": "పాస్‌వర్డ్ రక్షణ",
+  "Update": "మీ ఖాతా భద్రత కోసం మీ పాస్‌వర్డ్‌ను అప్డేట్ చేయండి",
+  "Personal Information": "వ్యక్తిగత సమాచారం",
+  "Manage": "మీ వృత్తి సమాచారం నిర్వహించండి",
+  "fields": {
+    "name": "పేరు",
+    "phone": "ఫోన్",
+    "businessName": "వ్యాపారం పేరు",
+    "address": "చిరునామా",
+    "district": "జిల్లా",
+    "mandal": "మండలం",
+    "pincode": "పిన్ కోడ్",
+    "registered": "నమోదైంది"
+  },
+  "placeholders": {
+    "old_password": "పాత పాస్‌వర్డ్",
+    "new_password": "కొత్త పాస్‌వర్డ్",
+    "confirm_password": "కొత్త పాస్‌వర్డ్ నిర్ధారించండి"
+  },
+  "alerts": {
+    "all_fields_required": "అన్ని ఫీల్డ్స్ అవసరం!",
+    "password_mismatch": "కొత్త పాస్‌వర్డ్ మరియు నిర్ధారణ పాస్‌వర్డ్ సరిపోలడం లేదు!",
+    "password_success": "పాస్‌వర్డ్ విజయవంతంగా మార్చబడింది!",
+    "password_failed": "పాస్‌వర్డ్ అప్డేట్ విఫలమైంది",
+    "update_success": "విజయవంతంగా అప్డేట్ చేయబడింది!",
+    "update_failed": "అప్డేట్ విఫలమైంది"
+  }
+}

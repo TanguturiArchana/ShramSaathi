@@ -1,8 +1,11 @@
 {
-  "stats": {
-    "owners_registered": "Total no. of owners registered",
-    "workers_registered": "Total no. of workers registered",
-    "jobs_posted": "Total jobs posted",
-    "active_jobs": "Total Active Jobs"
+  "title": "📊 Platform Statistics",
+  "subtitle": "Real-time metrics and insights",
+
+  "labels": {
+    "owners": "Total Owners",
+    "workers": "Total Workers",
+    "jobs": "Job Openings",
+    "active": "Active Jobs"
   }
 }

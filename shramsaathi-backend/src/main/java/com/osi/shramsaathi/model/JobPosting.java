@@ -1,5 +1,3 @@
-// src/main/java/com/osi/shramsaathi/model/JobPosting.java
-
 package com.osi.shramsaathi.model;
 
 import jakarta.persistence.*;

@@ -27,7 +27,6 @@ public class JobApplication {
 
     private LocalDateTime appliedAt = LocalDateTime.now();
 
-    // ---- Getters & Setters ----
     public Long getId() {
         return id;
     }

@@ -19,7 +19,7 @@ public class JobRequest {
     private LocalDate decisionDeadline; 
 
 
-    // getters and setters
+  
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 

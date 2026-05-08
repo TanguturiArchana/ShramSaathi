@@ -5,20 +5,17 @@ import "./OwnerLayout.css";
 const OwnerLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // if state available, use it; otherwise load from localStorage
   const state = location.state || JSON.parse(localStorage.getItem("ownerState"));
 
   useEffect(() => {
     if (location.state) {
-      // store in localStorage only once
       localStorage.setItem("ownerState", JSON.stringify(location.state));
       
     }
   }, [location.state]);
 
   if (!state) {
-    navigate("/"); // logout case
+    navigate("/");
     return null;
   }
 

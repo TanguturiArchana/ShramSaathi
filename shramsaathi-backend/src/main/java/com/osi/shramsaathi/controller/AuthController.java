@@ -22,10 +22,10 @@ public class AuthController {
     @Autowired
     private OwnerRepository ownerRepository;
 
-    // Register Worker
+    
     @PostMapping("/register/user")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-        //  Check if owner already registered as Worker
+        
         boolean existsAsWorker = userRepository.findByName(user.getName()).isPresent() && userRepository.findByPhone(user.getPhone()).isPresent();
         boolean existsAsOwner = ownerRepository.findByName(user.getName()).isPresent() && ownerRepository.findByPhone(user.getPhone()).isPresent();
         if (existsAsOwner) {
@@ -42,10 +42,10 @@ public class AuthController {
         return ResponseEntity.ok("Registration successful! Your generated password: " + password);
     }
 
-    // Register Owner
+    
     @PostMapping("/register/owner")
     public ResponseEntity<?> registerOwner(@RequestBody Owner owner) {
-        // Check if owner already registered as Worker
+        
         boolean existsAsWorker = userRepository.findByName(owner.getName()).isPresent() && userRepository.findByPhone(owner.getPhone()).isPresent();
         boolean existsAsOwner = ownerRepository.findByName(owner.getName()).isPresent() && ownerRepository.findByPhone(owner.getPhone()).isPresent();
          if (existsAsWorker) {
@@ -61,14 +61,13 @@ public class AuthController {
         return ResponseEntity.ok("Registration successful! Your generated password: " + password);
     }
 
-    // Login for Worker
+   
     @PostMapping("/login/user")
     public ResponseEntity<?> loginUser(@RequestParam String name, @RequestParam String password) {
         boolean success = authService.loginUser(name, password);
         return success ? ResponseEntity.ok("Login successful!") : ResponseEntity.status(401).body("Invalid credentials");
     }
 
-    // Login for Owner
     @PostMapping("/login/owner")
     public ResponseEntity<?> loginOwner(@RequestParam String name, @RequestParam String password) {
         boolean success = authService.loginOwner(name, password);
@@ -83,7 +82,7 @@ public class AuthController {
                 .orElse("User not found ");
     }
 
-    // Owner Login
+
     @PostMapping("/owner")
     public String ownerLogin(@RequestParam String name, @RequestParam String password) {
         return ownerRepository.findByName(name)

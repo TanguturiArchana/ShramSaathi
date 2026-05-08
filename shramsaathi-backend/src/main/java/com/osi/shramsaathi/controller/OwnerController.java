@@ -21,7 +21,6 @@ public class OwnerController  {
 
     private final OwnerService ownerService;
 
-    /** Register a new user */
     @PostMapping
     public ResponseEntity<OwnerResponse> register(@Valid @RequestBody OwnerRequest request) {
         OwnerResponse response = ownerService.register(request);
@@ -70,17 +69,11 @@ public class OwnerController  {
     }
 
 
-    /** Get all users */
+
     @GetMapping
     public ResponseEntity<List<OwnerResponse>> all() {
         return ResponseEntity.ok(ownerService.getAllOwnerResponses());
     }
 
-    /** Search users by work type and district */
-    // @GetMapping("/search")
-    // public ResponseEntity<List<OwnerResponse>> search(
-    //         @RequestParam String workType,
-    //         @RequestParam String district) {
-    //     return ResponseEntity.ok(ownerService.findByWorkTypeAndDistrict(workType, district));
-    // }
+    
 }

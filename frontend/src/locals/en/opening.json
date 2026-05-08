@@ -1,24 +1,16 @@
 {
-  "opening": {
-    "title": "Recent Job Openings",
-    "apply_now": "Apply Now",
-    "jobs": [
-      {
-        "id": 1,
-        "title": "Need A Plumber",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 15,000 / Month",
-        "type": "Full Time",
-        "website": "www.blujobs.in"
-      },
-      {
-        "id": 2,
-        "title": "Need A House Keeping Staff",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 30,000 / Month",
-        "type": "Full Time",
-        "website": "www.blujobs.in"
-      }
-    ]
-  }
+  "title": "Recent Job Openings",
+  "subtitle": "Live opportunities posted by owners across your area",
+  "live_hiring": "Live Hiring",
+  "general_work": "General Work",
+  "interest": "Interest",
+  "share": "Share",
+  "comments": "Comments",
+  "no_comments": "No comments yet. Be the first!",
+  "add_comment": "Add a comment...",
+  "send": "Send",
+  "apply": "View & Apply",
+  "per_month": "Month",
+  "currency": "INR",
+  "share_text": "Check out this amazing job opportunity: {{title}} at {{pay}}/Month on ShramSaathi! 🚀"
 }

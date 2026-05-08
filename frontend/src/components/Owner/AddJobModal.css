@@ -20,7 +20,7 @@
   background: white;
 }
 
-/* Buttons */
+
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
@@ -67,8 +67,8 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  padding: 20px; /* Prevents modal touching edges */
-  overflow-y: auto; /* Enables scrolling when modal is tall */
+  padding: 20px; 
+  overflow-y: auto; 
 }
 
 .modal {
@@ -76,8 +76,8 @@
   border-radius: 16px;
   padding: 2rem;
   width: 420px;
-  max-height: 90vh; /* 🔥 Prevent modal from exceeding screen height */
-  overflow-y: auto; /* 🔥 Scroll INSIDE modal */
+  max-height: 90vh; 
+  overflow-y: auto; 
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.25s ease;
 }
@@ -98,7 +98,7 @@
 .modal form {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem; /* Better spacing between inputs */
+  gap: 0.8rem; 
 }
 
 .modal input {

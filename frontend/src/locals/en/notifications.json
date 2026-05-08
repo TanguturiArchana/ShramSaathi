@@ -1,0 +1,8 @@
+{
+  "title": "Notifications",
+  "unread": "unread",
+  "no_notifications": "No notifications yet.",
+  "mark_read": "Mark as read",
+  "loading_error": "Failed to load notifications",
+  "time_format": "MMM dd, yyyy, hh:mm a"
+}

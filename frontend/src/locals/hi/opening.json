@@ -1,24 +1,16 @@
 {
-  "opening": {
-    "title": "हाल की नौकरी की घोषणाएँ",
-    "apply_now": "अभी आवेदन करें",
-    "jobs": [
-      {
-        "id": 1,
-        "title": "प्लंबर की आवश्यकता है",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 15,000 / Month",
-        "type": "पूर्णकालिक",
-        "website": "www.blujobs.in"
-      },
-      {
-        "id": 2,
-        "title": "हाउसकीपिंग स्टाफ की आवश्यकता है",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 30,000 / Month",
-        "type": "पूर्णकालिक",
-        "website": "www.blujobs.in"
-      }
-    ]
-  }
+  "title": "हाल की नौकरी के अवसर",
+  "subtitle": "आपके क्षेत्र में ओनर्स द्वारा पोस्ट की गई लाइव नौकरियां",
+  "live_hiring": "भर्ती जारी है",
+  "general_work": "सामान्य कार्य",
+  "interest": "रुचि",
+  "share": "शेयर",
+  "comments": "टिप्पणियाँ",
+  "no_comments": "अभी तक कोई टिप्पणी नहीं है। पहले बनें!",
+  "add_comment": "टिप्पणी लिखें...",
+  "send": "भेजें",
+  "apply": "देखें और आवेदन करें",
+  "per_month": "महीना",
+  "currency": "₹",
+  "share_text": "इस शानदार नौकरी को देखें: {{title}} ₹{{pay}}/महीना ShramSaathi पर! 🚀"
 }

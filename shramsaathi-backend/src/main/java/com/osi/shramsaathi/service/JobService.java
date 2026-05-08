@@ -13,7 +13,8 @@ public interface JobService {
     List<JobResponse> searchBySkill(String skill);
     
     // ✅ Add this line
-    List<JobResponse> getAllJobs();
+    List<JobResponse> getAllJobs(Long workerId);
     List<JobResponse> getAnalyticsJobsByOwner(Long ownerId);
+    List<JobResponse> getRecentJobs();
 
 }

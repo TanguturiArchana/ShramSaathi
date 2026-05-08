@@ -35,7 +35,7 @@ public class Job {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDate decisionDeadline;
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -148,6 +148,10 @@ public class Job {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-     public LocalDate getDecisionDeadline() { return decisionDeadline; }
-    public void setDecisionDeadline(LocalDate decisionDeadline) { this.decisionDeadline = decisionDeadline; }
+    public LocalDate getDecisionDeadline() { 
+        return decisionDeadline; 
+    }
+    public void setDecisionDeadline(LocalDate decisionDeadline) { 
+        this.decisionDeadline = decisionDeadline; 
+    }
 }

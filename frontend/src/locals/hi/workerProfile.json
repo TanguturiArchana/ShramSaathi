@@ -1,0 +1,48 @@
+{
+  "title": "कार्यकर्ता प्रोफ़ाइल",
+  "logout": "लॉगआउट",
+  "loading": "प्रोफ़ाइल लोड हो रही है...",
+  "not_found": "कार्यकर्ता नहीं मिला",
+  "yes": "हाँ",
+  "no": "नहीं",
+  "change_password": "पासवर्ड बदलें",
+  "update_password": "पासवर्ड अपडेट करें",
+  "cancel": "रद्द करें",
+  "update": "अपडेट",
+  "success": "सफल",
+  "error": "त्रुटि",
+  "warning": "चेतावनी",
+  "update_field": "अपडेट",
+  "Account Status": "खाता स्थिति",
+  "Your account is": "आपका खाता है",
+  "Registered": "पंजीकृत",
+  "Not Registered": "पंजीकृत नहीं",
+  "Account Settings": "खाता सेटिंग्स",
+  "Password Protection": "पासवर्ड सुरक्षा",
+  "Update": "अपने खाते की सुरक्षा बनाए रखने के लिए अपना पासवर्ड अपडेट करें",
+  "Personal Information": "व्यक्तिगत जानकारी",
+  "Manage": "अपनी पेशेवर जानकारी प्रबंधित करें",
+  "fields": {
+    "name": "नाम",
+    "phone": "फ़ोन",
+    "businessName": "व्यवसाय का नाम",
+    "address": "पता",
+    "district": "ज़िला",
+    "mandal": "मंडल",
+    "pincode": "पिनकोड",
+    "registered": "पंजीकृत"
+  },
+  "placeholders": {
+    "old_password": "पुराना पासवर्ड",
+    "new_password": "नया पासवर्ड",
+    "confirm_password": "नया पासवर्ड पुष्टि करें"
+  },
+  "alerts": {
+    "all_fields_required": "सभी फ़ील्ड आवश्यक हैं!",
+    "password_mismatch": "नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते!",
+    "password_success": "पासवर्ड सफलतापूर्वक बदल दिया गया!",
+    "password_failed": "पासवर्ड अपडेट विफल रहा",
+    "update_success": "सफलतापूर्वक अपडेट किया गया!",
+    "update_failed": "अपडेट विफल रहा"
+  }
+}

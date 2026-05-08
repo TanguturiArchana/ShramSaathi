@@ -36,18 +36,15 @@ public class Owner {
 
     @NotNull(message = "Pincode is required")
     private Integer pincode;
-//    
 
-    //  Use @Builder.Default so Lombok keeps the default value when using .builder()
     @Builder.Default
     private Boolean registered = true;
 
-    
-    // Hashed password stored here
+  
     @Column(nullable = false)
     private String password;
 
-    // 🔥 NEW FIELD (LANGUAGE)
+
     @Column(name = "preferred_language", length = 5)
     @Builder.Default
     private String preferredLanguage = "en";

@@ -22,7 +22,7 @@ const AddJobModal = ({ closeModal, onJobAdded ,id}) => {
     state: "",
     pincode: "",
     ownerName: "",
-    decisionDeadline: ""   // ✅ correct name matches backend Job.java
+    decisionDeadline: ""   
    });
 
   const handleChange = (e) => {
@@ -32,7 +32,7 @@ const AddJobModal = ({ closeModal, onJobAdded ,id}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-  // Normalize numeric fields: pincode -> int
+
       const payload = { ...form };
           
       await axios.get(`http://localhost:8083/api/jobs/owner/${id}`)

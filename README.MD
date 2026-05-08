@@ -46,8 +46,3 @@ mvn spring-boot:run
 
 
 
-import { useOutletContext } from "react-router-dom";
-const state = useOutletContext();
-const res = await axios.get(`${API_BASE}/jobs/owner/${state.id}`); // ownerId = 1 (temporary)
-        const jobsData = res.data;
-        const appRes = await axios.get(`${API_BASE}/applications/job/${job.id}`);

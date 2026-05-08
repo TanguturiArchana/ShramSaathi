@@ -35,7 +35,7 @@ public class User {
     private String address;
 
     @NotBlank(message = "Work type is required")
-    private String workType; // e.g., electrician, plumber
+    private String workType; 
 
     @NotBlank(message = "District is required")
     private String district;
@@ -46,22 +46,18 @@ public class User {
     @NotNull(message = "Pincode is required")
     private Integer pincode;
 
-    // New finer-grained address fields
     private String area;
     private String colony;
     private String state;
-    // Optional personal fields
     private Integer age;
     private Integer experienceYears;
 
-    //  Use @Builder.Default so Lombok keeps the default value when using .builder()
     @Builder.Default
     private Boolean registered = true;
-        // Hashed password stored here
+    
     @Column(nullable = false)
     private String password;
 
-    // 🔥 NEW FIELD (LANGUAGE)
     @Column(name = "preferred_language", length = 5)
     @Builder.Default
     private String preferredLanguage = "en";

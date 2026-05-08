@@ -4,14 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
 import "./RouteMap.css";
 
-// Custom icon for worker/viewer (blue)
 const blueIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
   iconSize: [32, 32],
   iconAnchor: [16, 32],
 });
 
-// Custom icon for owner (red)
+
 const redIcon = new L.Icon({
   iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
   iconSize: [32, 32],
@@ -22,12 +21,12 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
   const mapRef = useRef(null);
   const [originState, setOriginState] = useState(origin);
 
-  // Keep originState in sync with the origin prop (which is set by WorkerDashboard using navigator.geolocation)
+  
   useEffect(() => {
     setOriginState(origin);
   }, [origin]);
 
-  // fit bounds to show both points when map and destination are available
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -39,7 +38,7 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
         map.setView(originState, 13);
       }
     } catch (e) {
-      // ignore
+      
     }
   }, [originState, destination]);
 
@@ -58,7 +57,7 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* origin (worker) - blue */}
+        
         <Marker position={originState} icon={blueIcon}>
           <Popup>
             <strong>Worker</strong>
@@ -74,7 +73,7 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
           </Popup>
         </Marker>
 
-        {/* destination (owner) - red */}
+        
         {destination && (
           <Marker position={destination} icon={redIcon}>
             <Popup>
@@ -89,7 +88,7 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
                 </>
               )}
               <button onClick={() => {
-                // open Google Maps directions from origin to destination
+                
                 const url = `https://www.google.com/maps/dir/?api=1&origin=${originState[0]},${originState[1]}&destination=${destination[0]},${destination[1]}`;
                 window.open(url, "_blank");
               }}>Open Directions</button>
@@ -97,7 +96,7 @@ const RouteMap = ({ origin = [17.385, 78.4867], destination, originInfo = null, 
           </Marker>
         )}
 
-        {/* draw straight blue polyline between origin and destination (gives clear direction) */}
+       
         {destination && <Polyline positions={positions} pathOptions={{ color: "#2563eb", weight: 5 }} />}
       </MapContainer>
     </div>

@@ -1,24 +1,16 @@
 {
-  "opening": {
-    "title": "తాజా ఉద్యోగావకాశాలు",
-    "apply_now": "ఇప్పుడే దరఖాస్తు చేయండి",
-    "jobs": [
-      {
-        "id": 1,
-        "title": "ప్లంబర్ అవసరం",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 15,000 / Month",
-        "type": "పూర్తి సమయం",
-        "website": "www.blujobs.in"
-      },
-      {
-        "id": 2,
-        "title": "హౌస్ కీపింగ్ స్టాఫ్ అవసరం",
-        "location": "#3 1st Main Kalidasa Layout, Kattigenahalli, Bengaluru Main Road, Yelahanka, Bangalore",
-        "salary": "INR 30,000 / Month",
-        "type": "పూర్తి సమయం",
-        "website": "www.blujobs.in"
-      }
-    ]
-  }
+  "title": "తాజా ఉద్యోగ అవకాశాలు",
+  "subtitle": "మీ ప్రాంతంలో యజమానులు పోస్ట్ చేసిన ఉద్యోగాలు",
+  "live_hiring": "నియామకం కొనసాగుతోంది",
+  "general_work": "సాధారణ పని",
+  "interest": "ఆసక్తి",
+  "share": "పంచుకోండి",
+  "comments": "వ్యాఖ్యలు",
+  "no_comments": "ఇంకా వ్యాఖ్యలు లేవు. మొదటిగా వ్యాఖ్యానించండి!",
+  "add_comment": "వ్యాఖ్యను నమోదు చేయండి...",
+  "send": "పంపండి",
+  "apply": "చూడండి & దరఖాస్తు చేయండి",
+  "per_month": "నెల",
+  "currency": "₹",
+  "share_text": "ఈ అద్భుతమైన ఉద్యోగాన్ని చూడండి: {{title}} ₹{{pay}}/నెల ShramSaathi లో! 🚀"
 }

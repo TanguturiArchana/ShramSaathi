@@ -23,7 +23,6 @@ public class AnalyticsController {
         this.appRepo = appRepo;
     }
 
-    // Owner: counts of applications per job (ownerId -> map jobId -> count)
     @GetMapping("/owner/{ownerId}/application-counts")
     public ResponseEntity<Map<Long, Long>> getApplicationCountsForOwner(@PathVariable Long ownerId) {
         List<Job> jobs = jobRepo.findByOwnerId(ownerId);
@@ -34,7 +33,7 @@ public class AnalyticsController {
         return ResponseEntity.ok(counts);
     }
 
-    // Worker summary: total jobs available, applied count, accepted count
+   
     @GetMapping("/worker/{workerId}/summary")
     public ResponseEntity<Map<String, Long>> getWorkerSummary(@PathVariable Long workerId) {
         long totalJobs = jobRepo.count();

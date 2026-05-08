@@ -1,0 +1,48 @@
+{
+  "title": "Worker Profile",
+  "logout": "Logout",
+  "loading": "Loading profile...",
+  "not_found": "Worker not found",
+  "yes": "Yes",
+  "no": "No",
+  "change_password": "Change Password",
+  "update_password": "Update Password",
+  "cancel": "Cancel",
+  "update": "Update",
+  "success":"success",
+  "error":"error",
+  "warning":"warning",
+  "update_field": "Update",
+  "Account Status":"Account Status",
+  "Your account is":"Your account is",
+  "Registered":"Registered",
+  "Not Registered":"Not Registered",
+  "Account Settings":"Account Settings",
+  "Password Protection":"Password Protection",
+  "Update":"Update your password to maintain account security",
+  "Personal Information":"Personal Information",
+  "Manage":"Manage your professional information",
+  "fields": {
+    "name": "Name",
+    "phone": "Phone",
+    "businessName": "Business Name",
+    "address": "Address",
+    "district": "District",
+    "mandal": "Mandal",
+    "pincode": "Pincode",
+    "registered": "Registered"
+  },
+  "placeholders": {
+    "old_password": "Old Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm New Password"
+  },
+  "alerts": {
+    "all_fields_required": "All fields are required!",
+    "password_mismatch": "New password and Confirm password do not match!",
+    "password_success": "Password changed successfully!",
+    "password_failed": "Password update failed",
+    "update_success": "Updated successfully!",
+    "update_failed": "Update failed"
+  }
+}

@@ -6,52 +6,57 @@ import com.osi.shramsaathi.model.JobPosting;
 import com.osi.shramsaathi.repository.JobRepository;
 import com.osi.shramsaathi.service.JobPostingService;
 import com.osi.shramsaathi.repository.JobApplicationRepository;
-
-
+import com.osi.shramsaathi.repository.UserRepository;
+import com.osi.shramsaathi.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.osi.shramsaathi.service.TranslationService;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/applications")
 @CrossOrigin(origins = "http://localhost:3000")
 public class JobApplicationController {
+     private final TranslationService translationService;
 
     private final JobApplicationRepository appRepo;
     private final JobRepository jobRepo;
     private final JobPostingService jobpostServ;
+    private final UserRepository userRepo;
+    
 
-    public JobApplicationController(JobApplicationRepository appRepo, JobRepository jobRepo, JobPostingService jobpostServ) {
+    public JobApplicationController(JobApplicationRepository appRepo, JobRepository jobRepo, JobPostingService jobpostServ,UserRepository userRespo,TranslationService translationService) {
         this.appRepo = appRepo;
         this.jobRepo = jobRepo;
         this.jobpostServ=jobpostServ;
+        this.translationService = translationService;
+        this.userRepo=userRespo;
     }
 
-    // ✅ Worker applies for a job (Prevent duplicate applications)
     @PostMapping
     public ResponseEntity<?> applyForJob(@RequestBody JobApplication application) {
-        // 🚫 Check if worker already applied for this job
-        Optional<JobApplication> existing = appRepo.findByJobIdAndWorkerId(application.getJobId(), application.getWorkerId());
-
+        Optional<JobApplication> existing =appRepo.findByJobIdAndWorkerId(application.getJobId(), application.getWorkerId());
         if (existing.isPresent()) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "⚠️ You have already applied for this job.");
             response.put("existingApplication", existing.get());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
-
-        // ✅ Save new application
+        User worker = userRepo.findById(application.getWorkerId()).orElseThrow(() -> new RuntimeException("Worker not found"));
+        application.setWorkerName(worker.getName());
+        application.setWorkerSkill(worker.getWorkType());
+        application.setAppliedAt(LocalDateTime.now()); 
         JobApplication saved = appRepo.save(application);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "✅ Job application submitted successfully!");
         response.put("application", saved);
         return ResponseEntity.ok(response);
     }
+    
 
-    // ✅ Get all applications for a specific job (Owner View)
     @GetMapping("/job/{jobId}")
     public ResponseEntity<List<JobApplication>> getApplicationsByJob(@PathVariable Long jobId) {
         return ResponseEntity.ok(appRepo.findByJobId(jobId));
@@ -61,29 +66,29 @@ public class JobApplicationController {
         return ResponseEntity.ok(jobpostServ.getJobsByOwner(ownerId));
     }
 
-
-    // ✅ Get all applications made by a specific worker (Worker View)
     @GetMapping("/worker/{workerId}")
     public ResponseEntity<List<Map<String, Object>>> getApplicationsByWorker(@PathVariable Long workerId) {
+        User worker = userRepo.findById(workerId).orElse(null);
+        String lang = worker != null && worker.getPreferredLanguage() != null? worker.getPreferredLanguage(): "en";
         List<JobApplication> apps = appRepo.findByWorkerId(workerId);
         List<Map<String, Object>> response = new ArrayList<>();
-
         for (JobApplication app : apps) {
             Map<String, Object> map = new HashMap<>();
             map.put("id", app.getId());
             map.put("workerId", app.getWorkerId());
             map.put("workerName", app.getWorkerName());
-            map.put("workerSkill", app.getWorkerSkill());
+            map.put("workerSkill", translationService.translate(app.getWorkerSkill(), lang));
             map.put("status", app.getStatus());
             map.put("appliedAt", app.getAppliedAt());
             map.put("jobId", app.getJobId());
-
-            // ✅ Fetch job details
             jobRepo.findById(app.getJobId()).ifPresentOrElse(job -> {
-                map.put("jobTitle", job.getTitle());
-                map.put("location", job.getLocation());
+                map.put("jobTitle",
+                        translationService.translate(job.getTitle(), lang));
+                map.put("location",
+                        translationService.translate(job.getLocation(), lang));
                 map.put("pay", job.getPay());
                 map.put("duration", job.getDuration());
+
             }, () -> {
                 map.put("jobTitle", "Job not found");
                 map.put("location", "-");
@@ -96,53 +101,28 @@ public class JobApplicationController {
         return ResponseEntity.ok(response);
     }
 
-       // ----------------------------------------------------------
-    // ⭐ UPDATED ACCEPT/REJECT ENDPOINT WITH DEADLINE CHECK
-    // ----------------------------------------------------------
+
     @PutMapping("/{id}/status")
-public ResponseEntity<?> updateStatus(
-        @PathVariable Long id,
-        @RequestParam String status
-) {
-    JobApplication app = appRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+    public ResponseEntity<?> updateStatus(@PathVariable Long id,@RequestParam String status) {
+        JobApplication app = appRepo.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+        Long jobId = app.getJobId();
+        Job job = jobRepo.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+        LocalDate deadline = job.getDecisionDeadline();
+        LocalDate today = LocalDate.now();
+        if (deadline != null && today.isAfter(deadline)) {
+            List<JobApplication> allApps = appRepo.findByJobId(jobId);
+            for (JobApplication a : allApps) {
+                if (a.getStatus().equalsIgnoreCase("PENDING")) {
+                    a.setStatus("REJECTED");
+                    appRepo.save(a);
+                }
+            }
 
-    Long jobId = app.getJobId();
-    Job job = jobRepo.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
-
-    // ---------------------------
-    // 🚨 Deadline as LocalDate
-    // ---------------------------
-    LocalDate deadline = job.getDecisionDeadline();
-    LocalDate today = LocalDate.now();
-
-    if (deadline != null && today.isAfter(deadline)) {
-
-    // 1️⃣ Auto reject all pending applications
-    List<JobApplication> allApps = appRepo.findByJobId(jobId);
-
-    for (JobApplication a : allApps) {
-        if (a.getStatus().equalsIgnoreCase("PENDING")) {
-            a.setStatus("REJECTED");
-            appRepo.save(a);
+            jobRepo.delete(job);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("⛔ Deadline passed. Job was automatically closed and removed.");
         }
+        app.setStatus(status.toUpperCase());
+        JobApplication saved = appRepo.save(app);
+        return ResponseEntity.ok(saved);
     }
-
-    // 2️⃣ Auto delete job (same as Owner clicking delete)
-    jobRepo.delete(job);
-
-    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body("⛔ Deadline passed. Job was automatically closed and removed.");
-}
-
-
-    // ------------------------------------------------------------
-    // BEFORE deadline → normal ACCEPT/REJECT
-    // ------------------------------------------------------------
-    app.setStatus(status.toUpperCase());
-    JobApplication saved = appRepo.save(app);
-
-    return ResponseEntity.ok(saved);
-}
 }

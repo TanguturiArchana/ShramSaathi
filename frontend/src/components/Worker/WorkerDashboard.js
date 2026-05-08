@@ -1,25 +1,67 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { connect as wsConnect, disconnect as wsDisconnect, send as wsSend, subscribe as wsSubscribe } from "../../services/socketService";
 import ChatModal from "./ChatModal";
 import RouteMap from "./RouteMap";
 import "./WorkerDashboard.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import WorkerNotifications from "./WorkerNotification";
+import WorkerSkillTest from "./WorkerSkillTest";
+
 
 const API_BASE = "http://localhost:8083/api";
 
 const WorkerDashboard = () => {
-   const location = useLocation();
-    const navigate = useNavigate();
-    const [workerId, setWorkerId] = useState(null);
-    const [jobs, setJobs] = useState([]);
-    const [applications, setApplications] = useState([]);
-    const [workerProfile, setWorkerProfile] = useState({
+  const { t } = useTranslation("workerDashboard");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const state =
+    location.state || JSON.parse(localStorage.getItem("workerState"));
+
+  const workerId = state?.id;
+
+  useEffect(() => {
+    if (location.state) {
+      localStorage.setItem("workerState", JSON.stringify(location.state));
+      
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (!state) navigate("/");
+  }, [state, navigate]);
+
+const [jobLikes, setJobLikes] = useState({});
+const [jobLikeCounts, setJobLikeCounts] = useState({});
+const [jobComments, setJobComments] = useState({});
+const [newJobComment, setNewJobComment] = useState({});
+const [expandedJobComments, setExpandedJobComments] = useState({});
+  
+    
+  const [jobs, setJobs] = useState([]);
+  const [activeTab, setActiveTab] = useState("jobs");
+  const [message, setMessage] = useState("");
+  const [chatApplication, setChatApplication] = useState(null);
+   const [routeTarget, setRouteTarget] = useState(null); // [lat, lng]
+  const [showRoute, setShowRoute] = useState(false);
+  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeLoadingJobId, setRouteLoadingJobId] = useState(null);
+  const [routeOrigin, setRouteOrigin] = useState(null);
+  const [routeOriginInfo, setRouteOriginInfo] = useState(null);
+  const [routeDestInfo, setRouteDestInfo] = useState(null);
+  const [routeKey, setRouteKey] = useState(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [watchId, setWatchId] = useState(null);
+   const [workerProfile, setWorkerProfile] = useState({
       name: "",
       skill: "",
+      workType: "",
       location: "",
       contact: "",
-      // worker pincode (used to geocode worker origin). Replace with real data for logged-in user.
       area: "",
       colony: "",
     state: "",
@@ -27,48 +69,67 @@ const WorkerDashboard = () => {
     age: "",
     experienceYears: "",
   });
-
-  const [activeTab, setActiveTab] = useState("jobs");
-  const [appliedJobs, setAppliedJobs] = useState(new Set());
-  const [message, setMessage] = useState("");
-  const [chatApplication, setChatApplication] = useState(null);
-  const [routeTarget, setRouteTarget] = useState(null); // [lat, lng]
-  const [showRoute, setShowRoute] = useState(false);
-  const [routeLoading, setRouteLoading] = useState(false);
-  const [routeOrigin, setRouteOrigin] = useState(null);
-  const [routeOriginInfo, setRouteOriginInfo] = useState(null);
-  const [routeDestInfo, setRouteDestInfo] = useState(null);
-  const [routeKey, setRouteKey] = useState(null);
-  const [isSharing, setIsSharing] = useState(false);
-  const [watchId, setWatchId] = useState(null);
-  const [showPincodeModal, setShowPincodeModal] = useState(false);
-  const [modalPincode, setModalPincode] = useState("");
-  
-useEffect(() => {
-  if (location.state) {
-    // store in localStorage only once
-    localStorage.setItem("ownerState", JSON.stringify(location.state));
-    setWorkerId(location.state.id);
-    
-  }
-}, [location.state]);
-
-const state = location.state || JSON.parse(localStorage.getItem("workerState"));
-
-useEffect(() => {
-  if (!state) {
-    navigate("/");
-  }
-}, [state]);
+  useEffect(() => {
+  if (!workerId) return;
+  axios
+    .get(`${API_BASE}/users/${workerId}`)
+    .then((res) => {
+      const profile = res.data || {};
+      setWorkerProfile({
+        name: profile.name || "",
+        skill: profile.skill || profile.workType || "",
+        workType: profile.workType || profile.skill || "",
+        location: profile.address || profile.location || "",
+        contact: profile.phone || profile.contact || "",
+        area: profile.area || "",
+        colony: profile.colony || "",
+        state: profile.state || "",
+        pincode: profile.pincode || "",
+        age: profile.age || "",
+        experienceYears: profile.experienceYears || profile.experience || "",
+      });
+    })
+    .catch((err) => {
+      console.error("Failed to load worker profile:", err);
+    });
+}, [workerId]);
 
 
+  const { data: jobsData = [], isLoading: jobsLoading } = useQuery({
+    queryKey: ["worker-jobs", workerId],
+    queryFn: async () => {
+      const [jobsRes, applicationsRes] = await Promise.all([
+        axios.get(`${API_BASE}/jobs/${workerId}`),
+        axios.get(`${API_BASE}/applications/worker/${workerId}`)
+      ]);
+
+      const appliedIds = new Set(
+        applicationsRes.data.map((app) => app.jobId)
+      );
+
+      return jobsRes.data.map((job) => ({
+        ...job,
+        alreadyApplied: appliedIds.has(job.id),
+        applicationStatus:
+          applicationsRes.data.find((app) => app.jobId === job.id)?.status ||
+          null
+      }));
+    },
+    enabled: !!workerId,
+    staleTime: 1000 * 60 * 10
+  });
+
+
+  useEffect(() => {
+  setJobs(jobsData);
+}, [jobsData]);
 
   const geocodeLocation = async ({ area, colony, state, pincode, text }) => {
     const base = "https://nominatim.openstreetmap.org/search";
     const cleanP = pincode ? String(pincode).trim() : "";
 
     const queries = [];
-    // prefer most specific: area + colony + pincode + state
+
     if (area || colony || cleanP || state) {
       let parts = [];
       if (area) parts.push(area);
@@ -78,14 +139,11 @@ useEffect(() => {
       parts.push("India");
       queries.push(parts.filter(Boolean).join(", "));
     }
-
-    // pincode + India
+   
     if (cleanP) queries.push(`${cleanP}, India`);
-
-    // free text fallback
+    
     if (text) queries.push(`${text} India`);
-
-    // last resort: just the pincode (no country)
+  
     if (cleanP) queries.push(cleanP);
 
     try {
@@ -96,15 +154,15 @@ useEffect(() => {
           const r = res.data[0];
           const lat = parseFloat(r.lat);
           const lon = parseFloat(r.lon);
-          // Validate result lies roughly within India bounding box
+          
           if (lat >= 6 && lat <= 38 && lon >= 68 && lon <= 98) {
             return [lat, lon];
           }
-          // if address country_code present, prefer only India
+          
           if (r.address && r.address.country_code && r.address.country_code.toLowerCase() === "in") {
             return [lat, lon];
           }
-          // otherwise continue to next query
+         
         }
       }
       return null;
@@ -113,350 +171,423 @@ useEffect(() => {
       return null;
     }
   };
+  const applyEngagementSnapshot = (snapshot) => {
+  if (!snapshot || !snapshot.jobId) return;
 
-  // ✅ Fetch all jobs and enrich with owner information
-  const fetchJobs = async () => {
-    try {
-      const jobsRes = await axios.get(`${API_BASE}/jobs`);
+  setJobLikes((prev) => ({
+    ...prev,
+    [snapshot.jobId]: !!snapshot.likedByCurrentWorker
+  }));
 
-      // If workerId is known, fetch applications for this worker; otherwise assume none
-      let applicationsRes = { data: [] };
-      if (workerId) {
-        try {
-          applicationsRes = await axios.get(`${API_BASE}/applications/worker/${workerId}`);
-        } catch (e) {
-          console.warn('Failed to fetch worker applications (will assume none):', e);
-          applicationsRes = { data: [] };
-        }
-      }
+  setJobLikeCounts((prev) => ({
+    ...prev,
+    [snapshot.jobId]: snapshot.likeCount || 0
+  }));
 
-      // Mark which jobs worker has already applied to
-      const appliedIds = new Set((applicationsRes.data || []).map(app => app.jobId));
-      setAppliedJobs(appliedIds);
+  setJobComments((prev) => ({
+    ...prev,
+    [snapshot.jobId]: snapshot.comments || []
+  }));
+};
 
-      // Enrich jobs with application status
-      const enrichedJobs = jobsRes.data.map(job => ({
-        ...job,
-        alreadyApplied: appliedIds.has(job.id),
-        applicationStatus: applicationsRes.data.find(app => app.jobId === job.id)?.status || null
-      }));
+const fetchEngagement = async (jobIds) => {
+  try {
+    const responses = await Promise.all(
+      jobIds.map((id) =>
+        axios.get(`${API_BASE}/engagement/jobs/${id}`, { params: { workerId } })
+      )
+    );
+    responses.forEach((res) => applyEngagementSnapshot(res.data));
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-      setJobs(enrichedJobs);
-    } catch (err) {
-      console.error('Failed to fetch jobs:', err);
-      setMessage('⚠️ Failed to load jobs. Please try again.');
-      setTimeout(() => setMessage(""), 3000);
-    }
-  };
+const toggleJobLike = (jobId) => {
+  axios.post(`${API_BASE}/engagement/jobs/${jobId}/likes`, { workerId })
+    .then(res => applyEngagementSnapshot(res.data))
+    .catch(err => console.error(err));
+};
 
-  useEffect(() => {
-    fetchJobs();
-    // connect websocket once
-    try { wsConnect(); } catch (e) {}
-  }, []);
+const addJobComment = (jobId) => {
+  if (!newJobComment[jobId]?.trim()) return;
 
-  // Re-fetch jobs when workerId becomes available so applied flags are correct
-  useEffect(() => {
-    if (workerId) fetchJobs();
-  }, [workerId]);
+  axios.post(`${API_BASE}/engagement/jobs/${jobId}/comments`, {
+  workerId,
+  comment: newJobComment[jobId]
+})
+    .then(res => applyEngagementSnapshot(res.data))
+    .catch(err => console.error(err));
 
-  // ✅ Fetch worker applications with full owner information
-  const fetchApplications = async () => {
-    try {
+  setNewJobComment(prev => ({ ...prev, [jobId]: "" }));
+};
+
+const deleteJobComment = (jobId, commentId) => {
+  axios.delete(`${API_BASE}/engagement/comments/${commentId}`, {
+  params: { workerId }
+})
+    .then(res => applyEngagementSnapshot(res.data))
+    .catch(err => console.error(err));
+};
+
+useEffect(() => {
+  if (!jobsData.length) return;
+
+  const subs = jobsData.map(job =>
+    wsSubscribe(`/topic/engagement/job/${job.id}`, (snap) => {
+      applyEngagementSnapshot(snap);
+    })
+  );
+
+  return () => subs.forEach(s => s?.unsubscribe());
+}, [jobsData]);
+ 
+
+  const { data: applications = [], isLoading: appsLoading } = useQuery({
+    queryKey: ["worker-applications", workerId],
+    queryFn: async () => {
       const [applicationsRes, jobsRes] = await Promise.all([
         axios.get(`${API_BASE}/applications/worker/${workerId}`),
-        axios.get(`${API_BASE}/jobs`)
+        axios.get(`${API_BASE}/jobs/${workerId}`)
       ]);
-      
-      // Create a lookup of jobs by ID for efficient access
-      const jobsById = {};
-      jobsRes.data.forEach(job => {
-        jobsById[job.id] = job;
-      });
 
-      // Combine application data with complete job and owner data
-      const enrichedApplications = applicationsRes.data.map(app => {
+      const jobsById = {};
+      jobsRes.data.forEach((job) => (jobsById[job.id] = job));
+
+      return applicationsRes.data.map((app) => {
         const relatedJob = jobsById[app.jobId] || {};
         return {
           ...app,
           jobTitle: relatedJob.title || `Job #${app.jobId}`,
-          location: relatedJob.location || app.location || 'Unknown Location',
-          pay: relatedJob.pay || app.pay || 'Pay not specified',
-          // Complete owner information from the job
-          ownerId: relatedJob.ownerId,
-          ownerName: relatedJob.ownerName,
-          ownerPincode: relatedJob.pincode,
-          ownerArea: relatedJob.area,
-          ownerColony: relatedJob.colony,
-          ownerState: relatedJob.state
+          location: relatedJob.location || "Unknown",
+          pay: relatedJob.pay || "",
+          ownerId: relatedJob.ownerId
         };
       });
+    },
+    enabled: !!workerId && activeTab === "applications",
+    staleTime: 1000 * 60 * 10,
+    onSuccess: (data) => {
+  fetchEngagement(data.map(j => j.id));
+}
+  });
 
-      console.log("Enriched Applications with owner info:", enrichedApplications); // For debugging
-      setApplications(enrichedApplications);
+   useEffect(() => {
+    if (!workerId) return;
+    
+    try { wsConnect(); } catch (e) {}
+    
+  }, [workerId]);
+  
 
-      // Update applied jobs set
-      const appliedIds = new Set(enrichedApplications.map((app) => app.jobId));
-      setAppliedJobs(appliedIds);
-    } catch (err) {
-      console.error('Failed to fetch applications:', err);
-      setMessage('Failed to load applications. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === "applications") {
-      fetchApplications();
-    }
-  }, [activeTab]);
-
-  // ✅ Apply for a job (protected against duplicates)
-  const handleApply = async (job) => {
-    try {
-      
-      const response = await axios.post(`${API_BASE}/applications`, {
+  const applyMutation = useMutation({
+    mutationFn: (job) =>
+      axios.post(`${API_BASE}/applications`, {
         jobId: job.id,
         workerId,
-        workerName: workerProfile.name,
-        workerSkill: workerProfile.skill,
-        status: "pending",
-      });
+        status: "pending"
+      }),
+    onSuccess: () => {
+      setMessage(t("messages.apply_success"));
 
-      // Debug: log server response for apply action
-      console.log('POST /api/applications response:', response && response.data ? response.data : response);
+      queryClient.invalidateQueries(["worker-jobs", workerId]);
+      queryClient.invalidateQueries(["worker-applications", workerId]);
 
-      setMessage(response.data.message || "✅ Applied successfully!");
-      setAppliedJobs((prev) => new Set(prev.add(job.id)));
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setMessage("⚠️ You’ve already applied for this job.");
-      } else {
-        setMessage("❌ Failed to apply. Try again.");
-      }
+      setTimeout(() => setMessage(""), 3000);
+    },
+    onError: (error) => {
+      if (error.response?.status === 409)
+        setMessage(t("messages.already_applied"));
+      else setMessage(t("messages.apply_failed"));
+
+      setTimeout(() => setMessage(""), 3000);
     }
+  });
 
-    setTimeout(() => setMessage(""), 3000);
-  };
-
-  
-  // Start sharing worker's browser geolocation to the backend via STOMP
-  const startSharingLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation not supported');
-      return;
-    }
-    if (isSharing) return;
-    const id = navigator.geolocation.watchPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        // publish to backend
-        wsSend(`/app/location/${workerId}`, { workerId, lat, lon, timestamp: Date.now() });
-      },
-      (err) => console.error('geo error', err),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-    );
-    setWatchId(id);
-    setIsSharing(true);
-  };
-
-  const stopSharingLocation = () => {
-    if (watchId != null) navigator.geolocation.clearWatch(watchId);
-    setWatchId(null);
-    setIsSharing(false);
-    try { wsDisconnect(); } catch (e) {}
-  };
-
-  // Subscribe to real-time location topic for this worker (updates can come from other clients)
-  useEffect(() => {
+   useEffect(() => {
     const sub = wsSubscribe(`/topic/location/${workerId}`, (msg) => {
       try {
-        const body = msg; // socketService already JSON-parses
+        const body = msg; 
         if (body && body.lat && body.lon) {
           setRouteOrigin([body.lat, body.lon]);
-          // if showing route, update key to force remount
+          
           setRouteKey(Date.now());
         }
       } catch (e) {}
     });
     return () => { if (sub) sub.unsubscribe(); };
-  }, []);
-
-  // Modal handlers
-  const openPincodeModal = (onSubmit) => {
-    setShowPincodeModal(true);
-  };
-  const submitPincodeModal = () => {
-    setShowPincodeModal(false);
-  };
+  }, [workerId]);
+ 
 
   return (
     <div className="worker-dashboard">
       <header className="worker-header">
-        <h1>👷 Worker Dashboard</h1>
-        <p>Find jobs, apply, and manage your profile easily</p>
+        <h1>{t("header.title")}</h1>
+        <p>{t("header.subtitle")}</p>
       </header>
 
-      {/* Feedback Message */}
+      
       {message && <div className="alert-msg">{message}</div>}
 
-      {/* Navigation Tabs */}
+      
       <div className="tabs">
         <button
           className={activeTab === "jobs" ? "tab active" : "tab"}
           onClick={() => setActiveTab("jobs")}
         >
-          🔍 Available Jobs
+          🔍 {t("tabs.available_jobs")} 
+ 
         </button>
         <button
           className={activeTab === "applications" ? "tab active" : "tab"}
           onClick={() => setActiveTab("applications")}
         >
-          📄 My Applications
+          📄 {t("tabs.my_applications")}
+        </button>
+        <button
+          className={activeTab === "skills" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("skills")}
+        >
+          🧠 {t("skill test")}
+        </button>
+        <button
+          className={activeTab === "notifications" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("notifications")}
+        >
+          🔔{t("notifications")} 
         </button>
       <button
       className={activeTab === "profile" ? "tab active" : "tab"}
       onClick={() => navigate("/WorkerProfile", { state: { id: workerId } })}>
-      👤 My Profile
+      👤 {t("tabs.my_profile")}
       </button>
 
       </div>
 
-      {/* JOBS TAB */}
+      
       {activeTab === "jobs" && (
         <div className="jobs-container">
+          {!workerProfile.workType && !workerProfile.skill && (
+            <div className="alert-msg" style={{ marginBottom: "1rem" }}>
+              {t("complete")}
+              <button
+                style={{ marginLeft: 10 }}
+                className="send-comment-btn"
+                onClick={() => setActiveTab("skills")}
+              >
+                {t("take")}
+              </button>
+            </div>
+          )}
           {jobs.length === 0 ? (
-            <p className="empty-msg">No jobs available right now.</p>
+            <p className="empty-msg">{t("jobs.no_jobs")}</p>
           ) : (
-            <table className="jobs-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Skill Needed</th>
-                  <th>Location</th>
-                  <th>Pay</th>
-                  <th>Duration</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.map((job) => (
-                  <tr key={job.id} className={job.alreadyApplied ? "applied-row" : ""}>
-                    <td>{job.title}</td>
-                    <td>{job.skillNeeded}</td>
-                    <td>
-                      {job.location}
-                      {job.area && <div className="location-detail">Area: {job.area}</div>}
-                      {job.colony && <div className="location-detail">Colony: {job.colony}</div>}
-                    </td>
-                    <td>₹{job.pay}</td>
-                    <td>{job.duration} days</td>
-                    <td>
-                      {job.alreadyApplied ? (
-                        <span className={`status ${job.applicationStatus?.toLowerCase()}`}>
-                          {job.applicationStatus}
-                        </span>
-                      ) : (
-                        <span className="status available">Available</span>
-                      )}
-                    </td>
-                    <td>
-                      {job.alreadyApplied ? (
-                        <button className="applied-btn" disabled>
-                          ✅ Already Applied
-                        </button>
-                      ) : (
-                        <button
-                          className="apply-btn"
-                          onClick={() => handleApply(job)}
+            <div className="jobs-grid">
+              {jobs.map((job) => (
+                <div key={job.id} className="job-card">
+                  <div className="job-card-header">
+                    <div className="job-title-section">
+                      <h3 className="job-title">{job.title}</h3>
+                      <p className="job-skill">
+                        <span className="skill-badge">🛠️ {job.skillNeeded}</span>
+                      </p>
+                    </div>
+                    <span className={`job-status ${job.alreadyApplied ? t("jobs.already_applied") : t("jobs.available")}}`}>
+                      {job.alreadyApplied ? ` ${job.applicationStatus || t("jobs.already_applied")}` : t("jobs.available")}
+                      
+                    </span>
+                  </div>
+
+                  
+                  <div className="job-card-details">
+                    <div className="detail-item">
+                      <span className="detail-icon">📍</span>
+                      <div className="detail-content">
+                        <strong>{t("jobs.table.location")}</strong>
+                        <p>{job.location}</p>
+                        {job.area && <small>Area: {job.area}</small>}
+                        {job.colony && <small> • Colony: {job.colony}</small>}
+                      </div>
+                    </div>
+                    
+                    <div className="detail-row">
+                      <div className="detail-item-inline">
+                        <span className="detail-icon">💰</span>
+                        <strong>₹{job.pay}</strong>
+                      </div>
+                      <div className="detail-item-inline">
+                        <span className="detail-icon">⏱️</span>
+                        <strong>{job.duration} {t("days")}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  
+                  <div className="job-engagement">
+                    <button 
+                      className={`like-btn ${jobLikes[job.id] ? 'liked' : ''}`}
+                      onClick={() => toggleJobLike(job.id)}
+                      title="Like this job"
+                    >
+                      {jobLikes[job.id] ? '❤️' : '🤍'} {jobLikeCounts[job.id] || 0}
+                    </button>
+                    
+                    <button 
+                      className="comments-toggle-btn"
+                      onClick={() => setExpandedJobComments(prev => ({...prev, [job.id]: !prev[job.id]}))}
+                      title="View comments"
+                    >
+                      💬 {jobComments[job.id]?.length || 0} {t("comments")}
+                    </button>
+                  </div>
+
+                 
+                  {expandedJobComments[job.id] && (
+                    <div className="comments-section">
+                      <div className="comments-list">
+                        {jobComments[job.id]?.length ? (
+                          jobComments[job.id].map(comment => (
+                            <div key={comment.id} className="comment-item">
+                              <div className="comment-header">
+                                <span className="comment-time">
+                                  {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ""}
+                                </span>
+                                <button 
+                                  className="delete-comment-btn"
+                                  onClick={() => deleteJobComment(job.id, comment.id)}
+                                  title="Delete comment"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <p className="comment-text">{comment.comment}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="no-comments">{t("no comments")}</p>
+                        )}
+                      </div>
+                      <div className="comment-input-wrapper">
+                        <input
+                          type="text"
+                          placeholder="Share your thoughts about this job..."
+                          className="comment-input"
+                          value={newJobComment[job.id] || ''}
+                          onChange={(e) => setNewJobComment(prev => ({...prev, [job.id]: e.target.value}))}
+                         onKeyDown={(e) => {if (e.key === 'Enter') addJobComment(job.id);}}
+                        />
+                        <button 
+                          className="send-comment-btn"
+                          onClick={() => addJobComment(job.id)}
+                          disabled={!newJobComment[job.id]?.trim()}
                         >
-                          Apply Now
-                        </button>
-                      )}
-                      {/* Show route button: uses job.pincode (owner) and workerProfile.pincode to geocode and show route */}
-                      <div style={{ marginTop: 6 }}>
-                        <button
-                          className="route-btn"
-                          onClick={async () => {
-                            const ownerPcode = job.pincode || job.postalCode || job.zip || job.postalcode;
-                            let destCoords = null;
-                            try {
-                              setRouteLoading(true);
-                              if (ownerPcode) destCoords = await geocodeLocation({ area: job.area, colony: job.colony, state: job.state, pincode: ownerPcode, text: job.location });
-                              else {
-                                const entered = window.prompt("Enter owner pincode / postal code (e.g. 500081)");
-                                if (entered) destCoords = await geocodeLocation({ pincode: entered, text: entered });
-                              }
-
-                              if (!destCoords) {
-                                alert("Could not resolve owner pincode to coordinates.");
-                                return;
-                              }
-
-                              // worker pincode from profile or prompt
-                              const workerPcode = workerProfile.pincode || window.prompt("Enter your pincode (worker)");
-                              if (!workerPcode) {
-                                alert("Worker pincode required to show route.");
-                                return;
-                              }
-
-                              const originCoords = await geocodeLocation({ area: workerProfile.area, colony: workerProfile.colony, state: workerProfile.state, pincode: workerPcode, text: workerProfile.location });
-                              if (!originCoords) {
-                                alert("Could not resolve your pincode to coordinates.");
-                                return;
-                              }
-
-                              // set origin/destination coords and info (area/colony/state/pincode)
-                              setRouteOrigin(originCoords);
-                              setRouteTarget(destCoords);
-                              // force RouteMap remount so previous maps don't linger
-                              setRouteKey(Date.now());
-                              setRouteOriginInfo({
-                                area: workerProfile.area || "",
-                                colony: workerProfile.colony || "",
-                                state: workerProfile.state || "",
-                                pincode: workerPcode,
-                              });
-                              setRouteDestInfo({
-                                area: job.area || "",
-                                colony: job.colony || "",
-                                state: job.state || "",
-                                pincode: ownerPcode,
-                              });
-                              setShowRoute(true);
-                            } finally {
-                              setRouteLoading(false);
-                            }
-                          }}
-                        >
-                          {routeLoading ? "Loading…" : "🗺️ Show Route"}
+                          {t("send")}
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  )}
+
+                  
+                  <div className="job-card-actions">
+                    {job.alreadyApplied ? (
+                      <button className="applied-btn" disabled>
+                        {t("jobs.already_applied")}
+                        
+                      </button>
+                    ) : (
+                      <button
+                        className="apply-btn"
+                        onClick={() => applyMutation.mutate(job)}
+
+                      >
+                        {t("jobs.apply") }
+                      </button>
+                    )}
+                    
+                    <button
+                      className="route-btn"
+                      onClick={async () => {
+                        const ownerPcode = job.pincode || job.postalCode || job.zip || job.postalcode;
+                        let destCoords = null;
+                        try {
+                          setRouteLoading(true);
+                          if (ownerPcode) destCoords = await geocodeLocation({ area: job.area, colony: job.colony, state: job.state, pincode: ownerPcode, text: job.location });
+                          else {
+                            const entered = window.prompt("Enter owner pincode / postal code (e.g. 500081)");
+                            if (entered) destCoords = await geocodeLocation({ pincode: entered, text: entered });
+                          }
+
+                          if (!destCoords) {
+                            const fallbackDest = [job.location, job.area, job.colony, job.state, ownerPcode]
+                              .filter(Boolean)
+                              .join(", ");
+                            const fallbackOrigin = [workerProfile.location, workerProfile.area, workerProfile.colony, workerProfile.state, workerProfile.pincode]
+                              .filter(Boolean)
+                              .join(", ");
+                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+                              fallbackOrigin || "Current Location"
+                            )}&destination=${encodeURIComponent(fallbackDest || "Owner Location")}`;
+                            window.open(mapsUrl, "_blank", "noopener,noreferrer");
+                            return;
+                          }
+
+                          const workerPcode = workerProfile.pincode || window.prompt("Enter your pincode (worker)");
+                          if (!workerPcode) {
+                            alert("Worker pincode required to show route.");
+                            return;
+                          }
+
+                          const originCoords = await geocodeLocation({ area: workerProfile.area, colony: workerProfile.colony, state: workerProfile.state, pincode: workerPcode, text: workerProfile.location });
+                          if (!originCoords) {
+                            alert("Could not resolve your pincode to coordinates.");
+                            return;
+                          }
+
+                          setRouteOrigin(originCoords);
+                          setRouteTarget(destCoords);
+                          setRouteKey(Date.now());
+                          setRouteOriginInfo({
+                            area: workerProfile.area || "",
+                            colony: workerProfile.colony || "",
+                            state: workerProfile.state || "",
+                            pincode: workerPcode,
+                          });
+                          setRouteDestInfo({
+                            area: job.area || "",
+                            colony: job.colony || "",
+                            state: job.state || "",
+                            pincode: ownerPcode,
+                          });
+                          setShowRoute(true);
+                        } finally {
+                          setRouteLoading(false);
+                        }
+                      }}
+                    >
+                      {routeLoading ? t("jobs.loading_route") : t("route")}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
 
-      {/* APPLICATIONS TAB */}
       {activeTab === "applications" && (
         <div className="applications-container">
           {applications.length === 0 ? (
-            <p className="empty-msg">You haven’t applied for any jobs yet.</p>
+            <p className="empty-msg">{t("applications.no_applications")}</p>
           ) : (
             <table className="applications-table">
               <thead>
                 <tr>
-                  <th>Job Title</th>
-                  <th>Location</th>
-                  <th>Pay</th>
-                  <th>Status</th>
-                  <th>Applied On</th>
-                  <th>Action</th>
+                  <th>{t("applications.table.job_title")}</th>
+                  <th>{t("applications.table.location")}</th>
+                  <th>{t("applications.table.pay")}</th>
+                  <th>{t("applications.table.status")}</th>
+                  <th>{t("applications.table.applied_on")}</th> 
+                  <th>{t("applications.table.action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -475,7 +606,7 @@ useEffect(() => {
                             : "pending"
                         }`}
                       >
-                        {app.status}
+                         {t(`status.${app.status.toLowerCase()}`)}
                       </span>
                     </td>
                     <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
@@ -495,7 +626,7 @@ useEffect(() => {
                             }}
                             title={app.ownerId ? "Click to chat with job owner" : "Owner information not available"}
                           >
-                            {app.ownerId ? "💬 Chat with Owner" : "⚠️ Chat Unavailable"}
+                            {app.ownerId ? t("applications.chat_owner") : t("applications.chat_unavailable")}
                           </button>
                           <button
                             className="route-btn"
@@ -512,7 +643,16 @@ useEffect(() => {
                                   }
 
                                   if (!destCoords) {
-                                    alert("Could not resolve owner pincode to coordinates.");
+                                    const fallbackDest = [app.location, app.ownerArea, app.ownerColony, app.ownerState, pcode]
+                                      .filter(Boolean)
+                                      .join(", ");
+                                    const fallbackOrigin = [workerProfile.location, workerProfile.area, workerProfile.colony, workerProfile.state, workerProfile.pincode]
+                                      .filter(Boolean)
+                                      .join(", ");
+                                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
+                                      fallbackOrigin || "Current Location"
+                                    )}&destination=${encodeURIComponent(fallbackDest || "Owner Location")}`;
+                                    window.open(mapsUrl, "_blank", "noopener,noreferrer");
                                     return;
                                   }
 
@@ -530,7 +670,7 @@ useEffect(() => {
 
                                   setRouteOrigin(originCoords);
                                   setRouteTarget(destCoords);
-                                  // force RouteMap remount so previous maps don't linger
+                                 
                                   setRouteKey(Date.now());
                                   setRouteOriginInfo({
                                     area: workerProfile.area || "",
@@ -550,7 +690,7 @@ useEffect(() => {
                                 }
                               }}
                           >
-                            🗺️ Route to Owner
+                            {t("applications.route_owner")}
                           </button>
                         </div>
                       )}
@@ -563,7 +703,15 @@ useEffect(() => {
         </div>
       )}
 
-      {/* CHAT MODAL */}
+      {activeTab === "skills" && (
+        <WorkerSkillTest
+          workerId={workerId}
+          defaultSkill={workerProfile.workType || workerProfile.skill || "general"}
+        />
+      )}
+
+      {activeTab === "notifications" && <WorkerNotifications workerId={workerId} />}
+
       {chatApplication && (
         <ChatModal
           applicationId={chatApplication.id}
@@ -573,7 +721,6 @@ useEffect(() => {
         />
       )}
 
-      {/* Route overlay/sidebar */}
       {showRoute && routeTarget && (
         <div className="route-overlay">
           <div className="route-content">
@@ -593,5 +740,3 @@ useEffect(() => {
 };
 
 export default WorkerDashboard;
-
-

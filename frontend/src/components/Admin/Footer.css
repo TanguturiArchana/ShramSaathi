@@ -1,6 +1,6 @@
 .footer {
-  background-color: #0f172a; /* dark navy gray */
-  color: #cbd5e1; /* light gray text */
+  background-color: #0f172a; 
+  color: #cbd5e1;
   text-align: center;
   padding: 24px 10px;
   font-size: 0.95rem;
@@ -13,10 +13,9 @@
 .footer-copy {
   margin-top: 8px;
   font-size: 0.85rem;
-  color: #94a3b8; /* lighter gray for copyright line */
+  color: #94a3b8; 
 }
 
-/* Small hover effect if you want to add links later */
 .footer a {
   color: #60a5fa;
   text-decoration: none;

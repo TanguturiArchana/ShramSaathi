@@ -1,5 +1,9 @@
 {
-  "welcome": "Welcome to Shramsaathi",
-  "description": "A digital bridge connecting skilled workers and employers. Our platform empowers carpenters, plumbers, electricians, and other daily-wage earners by providing visibility, direct job access, and freedom to choose work easily. Join now to find verified workers nearby and explore opportunities!",
-  "join_now": "Join Now"
+  
+  "welcome": "Trusted Worker Marketplace",
+  "heading":"Hire verified skilled workers faster, with confidence.",
+  "description": "ShramSaathi connects owners with reliable carpenters, electricians,masons, and technicians. Post jobs, review trust signals, and hirewith real-time engagement and transparent profiles.",
+  "join_now": "Worker Join",
+  "hiring":"Start Hiring"
+
 }

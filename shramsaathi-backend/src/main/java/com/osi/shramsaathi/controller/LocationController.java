@@ -13,10 +13,10 @@ public class LocationController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Worker sends location updates to /app/location/{workerId}
+    
     @MessageMapping("/location/{workerId}")
     public void receiveLocation(@DestinationVariable String workerId, LocationMessage msg) {
-        // Broadcast to subscribers on /topic/location/{workerId}
+        
         messagingTemplate.convertAndSend("/topic/location/" + workerId, msg);
     }
 
@@ -35,6 +35,5 @@ public class LocationController {
             this.timestamp = timestamp;
         }
 
-        // getters/setters if needed
     }
 }
